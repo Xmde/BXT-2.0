@@ -1,15 +1,7 @@
-# bxt-2.0
+# BXT Discord Bot Version 2
 
-Created with [create-ts-pro](https://github.com/Milo123459/create-ts-pro)
+## Uses a Module based command system where each guild can enable and disable commands and modules.
 
-# create-ts-pro
+## Made is TS and uses mongodb. Stores info about enabled modules and commands in mongo.
 
-Features:
-
-* Yarn PnP
-* Husky config
-* Good defaults
-* Linters
-* Yarn bump command
-* Bump plugin & TypeScript plugin
-* Cool build / bundle commands (yarn.build)
+### TODO List is located in todo.md

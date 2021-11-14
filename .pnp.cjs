@@ -37,9 +37,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@commitlint/cli", "npm:14.1.0"],
             ["@commitlint/config-angular", "npm:14.1.0"],
+            ["@discordjs/builders", "npm:0.8.2"],
+            ["@discordjs/rest", "npm:0.1.0-canary.0"],
             ["@types/glob", "npm:7.2.0"],
             ["@types/node", "npm:16.11.7"],
             ["consola", "npm:2.15.3"],
+            ["discord-api-types", "npm:0.24.0"],
             ["discord.js", "npm:13.3.1"],
             ["glob", "npm:7.2.0"],
             ["husky", "npm:7.0.4"],
@@ -318,6 +321,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@discordjs/collection", [
+        ["npm:0.1.6", {
+          "packageLocation": "./.yarn/cache/@discordjs-collection-npm-0.1.6-bad654db9e-a0ddf75709.zip/node_modules/@discordjs/collection/",
+          "packageDependencies": [
+            ["@discordjs/collection", "npm:0.1.6"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:0.3.2", {
           "packageLocation": "./.yarn/cache/@discordjs-collection-npm-0.3.2-6bc63ee491-77def13598.zip/node_modules/@discordjs/collection/",
           "packageDependencies": [
@@ -334,6 +344,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["asynckit", "npm:0.4.0"],
             ["combined-stream", "npm:1.0.8"],
             ["mime-types", "npm:2.1.34"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@discordjs/rest", [
+        ["npm:0.1.0-canary.0", {
+          "packageLocation": "./.yarn/cache/@discordjs-rest-npm-0.1.0-canary.0-5a6170a1b0-5588b3636c.zip/node_modules/@discordjs/rest/",
+          "packageDependencies": [
+            ["@discordjs/rest", "npm:0.1.0-canary.0"],
+            ["@discordjs/collection", "npm:0.1.6"],
+            ["@sapphire/async-queue", "npm:1.1.9"],
+            ["@sapphire/snowflake", "npm:1.3.6"],
+            ["abort-controller", "npm:3.0.0"],
+            ["discord-api-types", "npm:0.18.1"],
+            ["form-data", "npm:4.0.0"],
+            ["node-fetch", "npm:2.6.6"],
+            ["tslib", "npm:2.3.1"]
           ],
           "linkType": "HARD",
         }]
@@ -400,6 +427,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@sapphire-async-queue-npm-1.1.9-8b055e278e-8a4cb79e01.zip/node_modules/@sapphire/async-queue/",
           "packageDependencies": [
             ["@sapphire/async-queue", "npm:1.1.9"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sapphire/snowflake", [
+        ["npm:1.3.6", {
+          "packageLocation": "./.yarn/cache/@sapphire-snowflake-npm-1.3.6-cc3270d128-da29c90b25.zip/node_modules/@sapphire/snowflake/",
+          "packageDependencies": [
+            ["@sapphire/snowflake", "npm:1.3.6"]
           ],
           "linkType": "HARD",
         }]
@@ -589,6 +625,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/abbrev-npm-1.1.1-3659247eab-a4a97ec07d.zip/node_modules/abbrev/",
           "packageDependencies": [
             ["abbrev", "npm:1.1.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["abort-controller", [
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/abort-controller-npm-3.0.0-2f3a9a2bcb-170bdba9b4.zip/node_modules/abort-controller/",
+          "packageDependencies": [
+            ["abort-controller", "npm:3.0.0"],
+            ["event-target-shim", "npm:5.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -858,9 +904,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["bxt-2.0", "workspace:."],
             ["@commitlint/cli", "npm:14.1.0"],
             ["@commitlint/config-angular", "npm:14.1.0"],
+            ["@discordjs/builders", "npm:0.8.2"],
+            ["@discordjs/rest", "npm:0.1.0-canary.0"],
             ["@types/glob", "npm:7.2.0"],
             ["@types/node", "npm:16.11.7"],
             ["consola", "npm:2.15.3"],
+            ["discord-api-types", "npm:0.24.0"],
             ["discord.js", "npm:13.3.1"],
             ["glob", "npm:7.2.0"],
             ["husky", "npm:7.0.4"],
@@ -1327,6 +1376,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["discord-api-types", [
+        ["npm:0.18.1", {
+          "packageLocation": "./.yarn/cache/discord-api-types-npm-0.18.1-2d70d751ed-05e56e7219.zip/node_modules/discord-api-types/",
+          "packageDependencies": [
+            ["discord-api-types", "npm:0.18.1"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:0.24.0", {
           "packageLocation": "./.yarn/cache/discord-api-types-npm-0.24.0-88283ebeed-b1a17cb3be.zip/node_modules/discord-api-types/",
           "packageDependencies": [
@@ -1456,6 +1512,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["event-target-shim", [
+        ["npm:5.0.1", {
+          "packageLocation": "./.yarn/cache/event-target-shim-npm-5.0.1-cb48709025-1ffe3bb22a.zip/node_modules/event-target-shim/",
+          "packageDependencies": [
+            ["event-target-shim", "npm:5.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["execa", [
         ["npm:5.1.1", {
           "packageLocation": "./.yarn/cache/execa-npm-5.1.1-191347acf5-fba9022c8c.zip/node_modules/execa/",
@@ -1509,6 +1574,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/form-data-npm-3.0.1-d080d436e0-b019e8d35c.zip/node_modules/form-data/",
           "packageDependencies": [
             ["form-data", "npm:3.0.1"],
+            ["asynckit", "npm:0.4.0"],
+            ["combined-stream", "npm:1.0.8"],
+            ["mime-types", "npm:2.1.34"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:4.0.0", {
+          "packageLocation": "./.yarn/cache/form-data-npm-4.0.0-916facec2d-01135bf867.zip/node_modules/form-data/",
+          "packageDependencies": [
+            ["form-data", "npm:4.0.0"],
             ["asynckit", "npm:0.4.0"],
             ["combined-stream", "npm:1.0.8"],
             ["mime-types", "npm:2.1.34"]

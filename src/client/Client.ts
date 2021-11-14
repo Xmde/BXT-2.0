@@ -15,6 +15,7 @@ import { Event } from '../interfaces/Event';
 import { Config } from '../interfaces/config';
 import { GlobalCommand } from '../interfaces/Command';
 import { Database } from '../database/Database';
+import { BotModule } from '../interfaces/module';
 
 // Allows to use glob with async/await
 const globPromise = promisify(glob);
@@ -22,6 +23,7 @@ const globPromise = promisify(glob);
 class Bot extends Client {
 	public logger: Consola = consola;
 	public events: Collection<string, Event> = new Collection();
+	public modules: Collection<string, BotModule> = new Collection();
 	public globalCommands: Collection<string, GlobalCommand> = new Collection();
 	public db: Database;
 	public config: Config;
@@ -71,13 +73,21 @@ class Bot extends Client {
 				`Registered new Event | ${file.name} | Once?${file.once}`
 			);
 		});
-
+		// Sets up Modules and adds them to the modules collection
+		const moduleFiles: string[] = await globPromise(
+			`${__dirname}/../modules/*/*Module{.js,.ts}`
+		);
+		moduleFiles.forEach(async (value: string) => {
+			const module: BotModule = new (await import(value)).default(this);
+			this.modules.set(module.name, module);
+		});
+		// Sets up the database
 		this.db = new Database(this.config.mongoURI);
 	}
 
 	// Function to allow easier embeding messages.
 	public embed(options: MessageEmbedOptions, message: Message): MessageEmbed {
-		return new MessageEmbed({ ...options, color: 'RANDOM' }).setFooter(
+		return new MessageEmbed({ color: 'RANDOM', ...options }).setFooter(
 			`${message.author.tag} | ${this.user.username} | Developed by Xmde#1337`,
 			message.author.displayAvatarURL({ format: 'png', dynamic: true })
 		);

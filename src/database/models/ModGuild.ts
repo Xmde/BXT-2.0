@@ -1,41 +1,85 @@
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 // Sets up the Module Guild Schema Model for the database
 // The ModGuild Model nestes diffrent schemas for modules and commands.
 
-interface ModGuild {
+export interface DBModGuild extends Document {
 	guildId: string;
-	modules: [Module];
+	modules: DBModule[];
+	getModule: (name: string) => DBModule | undefined;
+	getCommand: (moduleName: string, name: string) => DBCommand | undefined;
 }
 
-interface Module {
+export interface DBSetting {
+	key: string;
+	value: any;
+}
+export interface DBModule {
 	name: string;
-	commands: [Command];
+	commands: DBCommand[];
 	enabled: boolean;
+	settings: DBSetting[];
 }
 
-interface Command {
+export interface DBCommand {
 	name: string;
-	permission: string;
+	permissions: DBPermission[];
 	enabled: boolean;
+	settings: DBSetting[];
+	commandId: string;
 }
 
-const CommandSchema = new Schema<Command>({
-	name: { type: String, required: true },
-	permission: { type: String, required: true, default: '' },
-	enabled: { type: Boolean, required: true, default: false },
+export interface DBPermission {
+	type: 'USER' | 'ROLE';
+	id: string;
+	permission: boolean;
+}
+
+const SettingSchema = new Schema<DBSetting>({
+	key: { type: String, required: true },
+	value: { type: Schema.Types.Mixed, required: true },
 });
 
-const ModuleSchema = new Schema<Module>({
+const PermissionSchema = new Schema<DBPermission>({
+	type: { type: String, required: true },
+	id: { type: String, required: true },
+	permission: { type: Boolean, required: true, default: true },
+});
+
+const CommandSchema = new Schema<DBCommand>({
+	name: { type: String, required: true },
+	permissions: { type: [PermissionSchema], required: true },
+	enabled: { type: Boolean, required: true, default: false },
+	settings: { type: [SettingSchema], required: true, default: [] },
+	commandId: String,
+});
+
+const ModuleSchema = new Schema<DBModule>({
 	name: { type: String, required: true },
 	commands: { type: [CommandSchema], required: true },
 	enabled: { type: Boolean, required: true, default: false },
+	settings: { type: [SettingSchema], required: true, default: [] },
 });
 
-const ModGuildSchema = new Schema<ModGuild>({
+const ModGuildSchema = new Schema<DBModGuild>({
 	guildId: { type: String, required: true },
 	modules: { type: [ModuleSchema], required: true },
 });
 
-export const Model = model<ModGuild>('modguild', ModGuildSchema);
+ModGuildSchema.methods.getModule = function (
+	name: string
+): DBModule | undefined {
+	return this.modules.find((m) => m.name === name);
+};
+
+ModGuildSchema.methods.getCommand = function (
+	moduleName: string,
+	name: string
+): DBCommand | undefined {
+	const module = this.getModule(moduleName);
+	if (!module) return undefined;
+	return module.commands.find((c) => c.name === name);
+};
+
+export const Model = model<DBModGuild>('modguild', ModGuildSchema);
 export const name: string = 'modguild';

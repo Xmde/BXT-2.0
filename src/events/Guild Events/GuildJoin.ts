@@ -4,12 +4,9 @@
 
 import { Guild } from 'discord.js';
 import { RunFunction } from '../../interfaces/Event';
-import glob from 'glob';
-import { promisify } from 'util';
-import { Module } from '../../interfaces/Module';
+import { BotModule } from '../../interfaces/module';
 import { Bot } from '../../client/Client';
-
-const globPromise = promisify(glob);
+import { DBCommand, DBPermission } from '../../database/models/ModGuild';
 
 export const name: string = 'guildCreate';
 export const once: boolean = false;
@@ -29,30 +26,30 @@ export const run: RunFunction = async (client, guild: Guild) => {
 
 export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 	const ModGuildSchema = client.db.load('modguild');
-	const modules = [];
+	let ModGuild = await ModGuildSchema.findOne({ guildId });
+	if (!ModGuild) {
+		ModGuild = await ModGuildSchema.create({ guildId, modules: [] });
+	}
+	client.logger.trace(`Setting up guild | ${guildId}`);
 
-	client.logger.debug(`Setting up guild | ${guildId}`);
-
-	const moduleFiles = await globPromise(
-		`${__dirname}/../modules/*/*Module{.ts,.js}`
-	);
-	client.logger.trace(`Module Files | ${moduleFiles}`);
-
-	await Promise.all(
-		moduleFiles.map(async (value: string) => {
-			const module: Module = await import(value);
-			const commands = await module.commands;
-			const commandArray = [];
-			commands.forEach((value) => {
-				commandArray.push({ name: value.name });
+	client.modules.forEach((module: BotModule) => {
+		if (ModGuild.modules.some((m) => m.name === module.name)) return;
+		const commands: DBCommand[] = [];
+		module.commands.forEach((command) => {
+			commands.push({
+				name: command.name,
+				permissions: command.permissions,
+				enabled: false,
+				settings: command.defaultSettings.map((value, key) => ({ key, value })),
+				commandId: '',
 			});
-			modules.push({
-				name: module.name,
-				commands: commandArray,
-			});
-		})
-	);
-	if (await ModGuildSchema.findOne({ guildId }))
-		ModGuildSchema.updateOne({ guildId }, { guildId, modules });
-	else ModGuildSchema.create({ guildId, modules });
+		});
+		ModGuild.modules.push({
+			name: module.name,
+			commands,
+			enabled: false,
+			settings: module.defaultSettings.map((value, key) => ({ key, value })),
+		});
+	});
+	ModGuild.save();
 }
