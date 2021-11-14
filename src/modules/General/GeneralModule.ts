@@ -18,7 +18,7 @@ export default class GeneralModule extends BotModule {
 		);
 	}
 	public async disable(client: Bot, guild: Guild): Promise<void> {
-		this.disableCommands(client, guild);
+		await this.disableCommands(client, guild);
 		await this.setStatus(client, guild.id, false);
 		client.logger.info(
 			`Disabled module ${this.displyName} for guild ${guild.name}`
