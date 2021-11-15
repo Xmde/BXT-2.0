@@ -44,6 +44,7 @@ class Bot extends Client {
 	// Also inits the global command and event handler
 	// As well as the database
 	public async start(config: Config): Promise<void> {
+		this.initLogger();
 		this.config = config;
 		this.login(this.config.token);
 
@@ -117,6 +118,17 @@ class Bot extends Client {
 		message: Message
 	): MessageOptions {
 		return { embeds: [this.embed(options, message)], components: [] };
+	}
+
+	private initLogger(): void {
+		process.on('uncaughtException', (error) => {
+			const ErrorSchema = this.db.load('error');
+			ErrorSchema.create({ error });
+			this.logger.error(error);
+		});
+		process.on('unhandledRejection', (error) => {
+			throw error;
+		});
 	}
 }
 

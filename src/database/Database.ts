@@ -2,6 +2,7 @@ import { Collection } from 'discord.js';
 import mongoose, { Model } from 'mongoose';
 import glob from 'glob';
 import { promisify } from 'util';
+import consolaGlobalInstance from 'consola';
 
 const globPromise = promisify(glob);
 
@@ -21,6 +22,7 @@ class Database {
 		const modelFiles = await globPromise(`${__dirname}/models/*{.ts,.js}`);
 		modelFiles.forEach(async (value: string) => {
 			const model = await import(value);
+			consolaGlobalInstance.info(`Loaded model ${model.name}`);
 			this.models.set(model.name, model.Model);
 		});
 	}
