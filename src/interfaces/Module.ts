@@ -13,9 +13,19 @@ abstract class BotModule {
 	public commands: Collection<string, Command>;
 	private dirname: string;
 
-	public abstract enable(bot: Bot, guild: Guild): Promise<void>;
-	public abstract disable(bot: Bot, guild: Guild): Promise<void>;
-	public abstract defaultSettings: Collection<string, any>;
+	public async enable(bot: Bot, guild: Guild): Promise<void> {
+		await this.setStatus(bot, guild.id, true);
+		bot.logger.info(
+			`Enabled module ${this.displyName} for guild ${guild.name}`
+		);
+	}
+	public async disable(bot: Bot, guild: Guild): Promise<void> {
+		await this.setStatus(bot, guild.id, false);
+		bot.logger.info(
+			`Disabled module ${this.displyName} for guild ${guild.name}`
+		);
+	}
+	public defaultSettings: Collection<string, any> = new Collection();
 
 	public constructor(name: string, dirname: string) {
 		this.name = name;
@@ -47,6 +57,8 @@ abstract class BotModule {
 		if (!module) return;
 		module.enabled = status;
 		await ModGuild.save();
+		if (!status)
+			await this.disableCommands(client, client.guilds.cache.get(guildId));
 	}
 
 	protected async disableCommands(client: Bot, guild: Guild): Promise<void> {
@@ -60,6 +72,17 @@ abstract class BotModule {
 					await command.disable(client, guild);
 			})
 		);
+	}
+
+	public async isEnabled(client: Bot, guild: Guild): Promise<boolean> {
+		const ModGuildSchema = client.db.load('modguild');
+		const ModGuild: DBModGuild = await ModGuildSchema.findOne({
+			guildId: guild.id,
+		});
+		if (!ModGuild) return false;
+		const module = ModGuild.getModule(this.name);
+		if (!module) return false;
+		return module.enabled;
 	}
 }
 

@@ -1,11 +1,10 @@
-// Simple module for general commands
+// Simple module for Utility Commands
 import { Bot } from '../../client/Client';
 import { BotModule } from '../../interfaces/Module';
-import { Collection } from 'discord.js';
 
-export default class FunModule extends BotModule {
+export default class UtilityModule extends BotModule {
 	constructor(client: Bot) {
-		super('fun', __dirname);
+		super('utility', __dirname);
 		client.logger.info(`Initializing module ${this.displyName}`);
 	}
 }

@@ -9,30 +9,32 @@ import {
 } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
-import { BotModule } from '../../../interfaces/module';
+import { BotModule } from '../../../interfaces/Module';
 
 const delay = async (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms));
 
 export default class PingCommand extends Command {
-	public defaultSettings = new Collection<string, any>();
-
 	constructor(module: BotModule) {
 		super({
 			name: 'rollercoaster',
-			help: 'Rollercoaster Command',
+			help: 'Makes the user have a FUN time',
 			info: 'Rollercoaster Command',
 			module,
 		});
-	}
-
-	public async enable(bot: Bot, guild: Guild): Promise<void> {
-		await this.setStatus(bot, guild.id, true);
-		this.registerCommand(bot, guild);
-	}
-	public async disable(bot: Bot, guild: Guild): Promise<void> {
-		await this.setStatus(bot, guild.id, false);
-		this.unregisterCommand(bot, guild);
+		this.data
+			.addUserOption((option) =>
+				option
+					.setName('user')
+					.setDescription('User that goes WHOOOOO')
+					.setRequired(true)
+			)
+			.addIntegerOption((option) =>
+				option
+					.setName('time')
+					.setDescription('How long shall it last')
+					.setRequired(true)
+			);
 	}
 
 	public async run(

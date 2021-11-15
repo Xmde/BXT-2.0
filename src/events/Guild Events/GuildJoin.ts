@@ -4,9 +4,13 @@
 
 import { Guild } from 'discord.js';
 import { RunFunction } from '../../interfaces/Event';
-import { BotModule } from '../../interfaces/module';
+import { BotModule } from '../../interfaces/Module';
 import { Bot } from '../../client/Client';
-import { DBCommand, DBPermission } from '../../database/models/ModGuild';
+import {
+	DBCommand,
+	DBModGuild,
+	DBPermission,
+} from '../../database/models/ModGuild';
 
 export const name: string = 'guildCreate';
 export const once: boolean = false;
@@ -26,17 +30,26 @@ export const run: RunFunction = async (client, guild: Guild) => {
 
 export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 	const ModGuildSchema = client.db.load('modguild');
-	let ModGuild = await ModGuildSchema.findOne({ guildId });
+	let ModGuild: DBModGuild = await ModGuildSchema.findOne({ guildId });
 	if (!ModGuild) {
 		ModGuild = await ModGuildSchema.create({ guildId, modules: [] });
 	}
 	client.logger.trace(`Setting up guild | ${guildId}`);
 
 	client.modules.forEach((module: BotModule) => {
-		if (ModGuild.modules.some((m) => m.name === module.name)) return;
-		const commands: DBCommand[] = [];
+		if (ModGuild.getModule(module.name)) return;
+		ModGuild.modules.push({
+			name: module.name,
+			commands: [],
+			enabled: false,
+			settings: module.defaultSettings.map((value, key) => ({ key, value })),
+		});
+	});
+
+	client.modules.forEach((module: BotModule) => {
 		module.commands.forEach((command) => {
-			commands.push({
+			if (ModGuild.getCommand(module.name, command.name)) return;
+			ModGuild.getModule(module.name)?.commands.push({
 				name: command.name,
 				permissions: command.permissions,
 				enabled: false,
@@ -44,12 +57,7 @@ export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 				commandId: '',
 			});
 		});
-		ModGuild.modules.push({
-			name: module.name,
-			commands,
-			enabled: false,
-			settings: module.defaultSettings.map((value, key) => ({ key, value })),
-		});
 	});
+
 	ModGuild.save();
 }

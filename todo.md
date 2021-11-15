@@ -8,9 +8,11 @@ _Italics_ - Low Priority
 
 ## Features
 
+- [x] **Implement command handleing**
+
 - [ ] **Implement more utility commands**
 
-- [ ] **Implement a smart help command**
+- [x] **Implement a smart help command**
 
 - [ ] _Comeup with more modules and commands for thoes modules_
 
@@ -20,7 +22,7 @@ _Italics_ - Low Priority
 
 ## Setup Menu
 
-- [ ] **Add permissions for the setup menu**
+- [x] **Add permissions for the setup menu**
 
 - [ ] _Figure out a solution for options in the setup menu_
 

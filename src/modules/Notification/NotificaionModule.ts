@@ -1,11 +1,10 @@
-// Simple module for general commands
+// Module for Notifications
 import { Bot } from '../../client/Client';
 import { BotModule } from '../../interfaces/Module';
-import { Collection } from 'discord.js';
 
-export default class FunModule extends BotModule {
+export default class NotificationModule extends BotModule {
 	constructor(client: Bot) {
-		super('fun', __dirname);
+		super('notification', __dirname);
 		client.logger.info(`Initializing module ${this.displyName}`);
 	}
 }

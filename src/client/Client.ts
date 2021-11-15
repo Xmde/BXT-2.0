@@ -8,6 +8,7 @@ import {
 	MessageEmbed,
 	MessageOptions,
 	Guild,
+	Interaction,
 } from 'discord.js';
 import glob from 'glob';
 import { promisify } from 'util';
@@ -15,7 +16,7 @@ import { Event } from '../interfaces/Event';
 import { Config } from '../interfaces/config';
 import { GlobalCommand } from '../interfaces/Command';
 import { Database } from '../database/Database';
-import { BotModule } from '../interfaces/module';
+import { BotModule } from '../interfaces/Module';
 
 // Allows to use glob with async/await
 const globPromise = promisify(glob);
@@ -52,6 +53,7 @@ class Bot extends Client {
 		const globalCommands: string[] = await globPromise(
 			`${__dirname}/../global commands/*{.ts,.js}`
 		);
+		this.logger.info(`Loading ${globalCommands.length} global commands`);
 		globalCommands.forEach(async (value: string) => {
 			const file: GlobalCommand = await import(value);
 			this.globalCommands.set(file.name, file);
@@ -86,11 +88,26 @@ class Bot extends Client {
 	}
 
 	// Function to allow easier embeding messages.
-	public embed(options: MessageEmbedOptions, message: Message): MessageEmbed {
-		return new MessageEmbed({ color: 'RANDOM', ...options }).setFooter(
-			`${message.author.tag} | ${this.user.username} | Developed by Xmde#1337`,
-			message.author.displayAvatarURL({ format: 'png', dynamic: true })
-		);
+	public embed(
+		options: MessageEmbedOptions,
+		message: Message | Interaction
+	): MessageEmbed {
+		if (message instanceof Interaction) {
+			return new MessageEmbed({ color: 'RANDOM', ...options })
+				.setFooter(
+					`${message.user.tag} | ${this.user.username} | Developed by Xmde#1337`,
+					message.user.displayAvatarURL({ format: 'png', dynamic: true })
+				)
+				.setTimestamp(Date.now());
+		}
+		if (message instanceof Message) {
+			return new MessageEmbed({ color: 'RANDOM', ...options })
+				.setFooter(
+					`${message.author.tag} | ${this.user.username} | Developed by Xmde#1337`,
+					message.author.displayAvatarURL({ format: 'png', dynamic: true })
+				)
+				.setTimestamp(Date.now());
+		}
 	}
 
 	// Function that allows it to be inserted directly into a message
@@ -99,7 +116,7 @@ class Bot extends Client {
 		options: MessageEmbedOptions,
 		message: Message
 	): MessageOptions {
-		return { embeds: [this.embed(options, message)] };
+		return { embeds: [this.embed(options, message)], components: [] };
 	}
 }
 

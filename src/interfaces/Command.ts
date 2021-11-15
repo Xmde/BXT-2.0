@@ -11,9 +11,8 @@ import {
 import { Bot } from '../client/Client';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { DBModGuild, DBPermission } from '../database/models/ModGuild';
-import { BotModule } from './module';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import { BotModule } from './Module';
+import consolaGlobalInstance from 'consola';
 
 export interface GlobalRunFunction {
 	(client: Bot, message: Message, args: string[]): Promise<unknown>;
@@ -34,16 +33,23 @@ export abstract class Command {
 	public info: string;
 	public module: BotModule;
 
-	public abstract defaultSettings: Collection<string, any>;
+	public defaultSettings: Collection<string, any> = new Collection();
 	public data: SlashCommandBuilder =
 		new SlashCommandBuilder().setDefaultPermission(false);
 
 	public abstract run(
 		client: Bot,
 		interaction: CommandInteraction
-	): Promise<void>;
-	public abstract enable(bot: Bot, guild: Guild): Promise<void>;
-	public abstract disable(bot: Bot, guild: Guild): Promise<void>;
+	): Promise<void> | void;
+
+	public async enable(bot: Bot, guild: Guild): Promise<void> {
+		await this.setStatus(bot, guild.id, true);
+		this.registerCommand(bot, guild);
+	}
+	public async disable(bot: Bot, guild: Guild): Promise<void> {
+		await this.setStatus(bot, guild.id, false);
+		this.unregisterCommand(bot, guild);
+	}
 
 	constructor({
 		name,
@@ -62,6 +68,7 @@ export abstract class Command {
 		this.info = info;
 		this.module = module;
 		this.data.setName(name).setDescription(help);
+		consolaGlobalInstance.info(`Initializing Command | ${this.name}`);
 	}
 
 	protected async setStatus(
@@ -141,14 +148,32 @@ export abstract class Command {
 		ModGuild.save();
 	}
 
-	protected async updatePermissions(client: Bot, guild: Guild): Promise<void> {
+	public async updatePermissions(client: Bot, guild: Guild): Promise<void> {
 		const ModGuildSchema = client.db.load('modguild');
 		const ModGuild: DBModGuild = await ModGuildSchema.findOne({
-			guildId: guild.ownerId,
+			guildId: guild.id,
 		});
 		const command = ModGuild.getCommand(this.module.name, this.name);
 		const discordCommand = await guild.commands.fetch(command.commandId);
 		const permissions: ApplicationCommandPermissions[] = command.permissions;
 		await discordCommand.permissions.set({ permissions });
+	}
+
+	public static getCommand(client: Bot, name: string) {
+		return client.modules
+			.filter((m) => (m.commands.get(name) ? true : false))
+			.first()
+			.commands.get(name);
+	}
+
+	public async isEnabled(client: Bot, guild: Guild): Promise<boolean> {
+		const ModGuildSchema = client.db.load('modguild');
+		const ModGuild: DBModGuild = await ModGuildSchema.findOne({
+			guildId: guild.id,
+		});
+		if (!ModGuild) return false;
+		const command = ModGuild.getCommand(this.module.name, this.name);
+		if (!command) return false;
+		return command.enabled;
 	}
 }

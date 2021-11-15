@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 import {
 	ButtonInteraction,
-	CacheType,
 	Interaction,
 	InteractionCollector,
 	Message,
@@ -12,13 +11,17 @@ import {
 	SelectMenuInteraction,
 } from 'discord.js';
 import { Bot } from '../client/Client';
-import { DBModGuild } from '../database/models/ModGuild';
+import {
+	DBCommand,
+	DBModGuild,
+	DBPermission,
+} from '../database/models/ModGuild';
 import { Command } from './Command';
-import { BotModule } from './module';
+import { BotModule } from './Module';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const timeout = 10000;
+const timeout = 45000;
 
 export class SetupMenu {
 	private client: Bot;
@@ -38,6 +41,10 @@ export class SetupMenu {
 	private moduleSettingsButtonsCollector: InteractionCollector<Interaction>;
 	private commandActionRowCollector: InteractionCollector<Interaction>;
 	private commandSettingsButtonsCollector: InteractionCollector<Interaction>;
+	private commandSettingsPermissionCollector: InteractionCollector<Interaction>;
+	private permissionSelectionMenuCollector: InteractionCollector<Interaction>;
+
+	private gracefullExit: boolean = false;
 
 	constructor(client: Bot, message: Message) {
 		this.client = client;
@@ -56,6 +63,8 @@ export class SetupMenu {
 		this.startModuleEnabledButonListener();
 		this.startListenerCommandActionRow();
 		this.startListenerCommandEnable();
+		this.startListenerCommandPermission();
+		this.startListenerPermissionSelectMenu();
 	}
 
 	private initCollectors() {
@@ -83,14 +92,27 @@ export class SetupMenu {
 			filter: this.createFilter(),
 			idle: timeout,
 		});
+		this.commandSettingsPermissionCollector =
+			this.message.createMessageComponentCollector({
+				filter: this.createFilter({ customId: 'command-permission-button' }),
+				idle: timeout,
+			});
+		this.permissionSelectionMenuCollector =
+			this.message.createMessageComponentCollector({
+				filter: this.createFilter({ customId: 'permission-select-menu' }),
+				idle: timeout,
+			});
 		this.timeoutCollector.on('collect', async () => {
 			this.moduleActionRowCollector.resetTimer();
 			this.moduleSettingsButtonsCollector.resetTimer();
 			this.commandActionRowCollector.resetTimer();
 			this.commandSettingsButtonsCollector.resetTimer();
 			this.timeoutCollector.resetTimer();
+			this.commandSettingsPermissionCollector.resetTimer();
+			this.permissionSelectionMenuCollector.resetTimer();
 		});
 		this.timeoutCollector.on('end', async () => {
+			if (this.gracefullExit) return;
 			this.message.edit({
 				content: 'BXT SETUP MENU TIMED OUT',
 				components: [],
@@ -247,6 +269,7 @@ export class SetupMenu {
 		this.commandSettingsButtonsCollector.on(
 			'collect',
 			async (i: ButtonInteraction) => {
+				if (!(await this.moduleEnabled())) return i.deferUpdate();
 				if (await this.commandEnabled())
 					await this.command.disable(this.client, this.userMessage.guild);
 				else await this.command.enable(this.client, this.userMessage.guild);
@@ -275,6 +298,75 @@ export class SetupMenu {
 					],
 				});
 				i.deferUpdate();
+			}
+		);
+	}
+
+	private startListenerCommandPermission() {
+		this.commandSettingsPermissionCollector.on(
+			'collect',
+			async (i: ButtonInteraction) => {
+				i.deferUpdate();
+				this.message.edit({
+					components: [await this.generatePermissionSelection()],
+					content: 'BXT SETUP MENU',
+				});
+			}
+		);
+	}
+
+	private startListenerPermissionSelectMenu() {
+		this.permissionSelectionMenuCollector.on(
+			'collect',
+			async (i: SelectMenuInteraction) => {
+				let perms: DBPermission[] = [
+					{
+						type: 'USER',
+						id: '125270885782388736',
+						permission: true,
+					},
+				];
+				i.deferUpdate();
+				this.message.edit(
+					this.client.messageEmbed(
+						{ description: 'PERMISSIONS UPDATED SECUSFULLY', color: 'GREEN' },
+						this.userMessage
+					)
+				);
+				const ModGuildSchema = this.client.db.load('modguild');
+				const ModGuild: DBModGuild = await ModGuildSchema.findOne({
+					guildId: this.message.guild.id,
+				});
+				i.values.forEach((v) => {
+					perms.push({
+						type: 'ROLE',
+						id: v,
+						permission: true,
+					});
+				});
+
+				ModGuild.getCommand(this.module.name, this.command.name).permissions =
+					perms;
+				await ModGuild.save();
+				this.command.updatePermissions(this.client, this.message.guild);
+				await delay(5000);
+				this.moduleActionRowCollector.resetTimer();
+				this.moduleSettingsButtonsCollector.resetTimer();
+				this.commandActionRowCollector.resetTimer();
+				this.commandSettingsButtonsCollector.resetTimer();
+				this.timeoutCollector.resetTimer();
+				this.commandSettingsPermissionCollector.resetTimer();
+				this.permissionSelectionMenuCollector.resetTimer();
+				this.message.edit({
+					content: 'BXT SETUP MENU',
+					components: [
+						this.moduleActionRow,
+						this.moduleSettingsButtons,
+						this.commandActionRow,
+						this.commandSettingsButtons,
+					],
+					embeds: [],
+				});
 			}
 		);
 	}
@@ -380,5 +472,35 @@ export class SetupMenu {
 			});
 		}
 		return new MessageActionRow().addComponents(selectMenu);
+	}
+
+	private async generatePermissionSelection(): Promise<MessageActionRow> {
+		const ModGuildSchema = this.client.db.load('modguild');
+		const ModGuild = await ModGuildSchema.findOne({
+			guildId: this.message.guild.id,
+		});
+		const command: DBCommand = ModGuild.getCommand(
+			this.module.name,
+			this.command.name
+		);
+		const roles = this.message.guild?.roles.cache;
+		const PermissionSelectMenu = new MessageSelectMenu()
+			.setCustomId('permission-select-menu')
+			.setPlaceholder('Select Roles')
+			.setMinValues(1)
+			.setMaxValues(roles.size);
+		roles.forEach((role) => {
+			const enabled = command.permissions.some((permission) => {
+				return permission.id === role.id;
+			});
+			PermissionSelectMenu.addOptions([
+				{
+					label: role.name,
+					value: role.id,
+					default: enabled,
+				},
+			]);
+		});
+		return new MessageActionRow().addComponents(PermissionSelectMenu);
 	}
 }
