@@ -24,9 +24,9 @@ _Italics_ - Low Priority
 
 - [x] **Add permissions for the setup menu**
 
-- [ ] _Figure out a solution for options in the setup menu_
+- [x] _Figure out a solution for options in the setup menu_
 
-- [ ] _Implement solution for options in the setup menu_
+- [ ] _Implement solution for options in the setup menu_ (Regestering a temporary command when the user clicks the button. Will allow for better options handeling)
 
 ## Other
 
@@ -35,3 +35,5 @@ _Italics_ - Low Priority
 - [ ] Runs tests with friends
 
 - [ ] Implement some sort of guild blacklist / whitelist system
+
+- [ ] _Implement a register command for the bot to make it private only_
