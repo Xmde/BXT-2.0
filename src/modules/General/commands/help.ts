@@ -18,7 +18,7 @@ export default class PingCommand extends Command {
 		client: Bot,
 		interaction: CommandInteraction<CacheType>
 	): Promise<void> {
-		const embed = client.embed(
+		const embed = Bot.embed(
 			{ title: 'Help', description: 'Helps you learn the commands' },
 			interaction
 		);

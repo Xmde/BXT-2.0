@@ -46,7 +46,7 @@ export default class PingCommand extends Command {
 		interaction.reply({
 			ephemeral: true,
 			embeds: [
-				client.embed(
+				Bot.embed(
 					{
 						description: `${amount} messages successfully deleted!`,
 						fields:

@@ -23,6 +23,7 @@ const globPromise = promisify(glob);
 
 /**
  * Custom class that entends the default discord.js Client
+ * Is a singleton class and only has one instance.
  */
 class Bot extends Client {
 	private static instance: Bot;
@@ -37,17 +38,19 @@ class Bot extends Client {
 	/**
 	 * The bot class is a singleton class.
 	 * This method returns the instance of the bot class
+	 * @param config The config file. This is only used once to start the bot. If the bot is already running, this parameter is ignored.
 	 * @returns The instance of the bot
 	 */
-	public static getInstance(): Bot {
+	public static getInstance(config: Config = null): Bot {
 		if (!this.instance) {
-			this.instance = new Bot();
+			this.instance = new Bot(config);
 		}
 		return this.instance;
 	}
 
 	//Sets up the discord bot
-	private constructor() {
+	private constructor(config: Config) {
+		if (!config) throw new Error('No config file provided');
 		super({
 			intents: [
 				Intents.FLAGS.GUILDS,
@@ -55,6 +58,10 @@ class Bot extends Client {
 				Intents.FLAGS.GUILD_MESSAGES,
 			],
 		});
+		this.config = config;
+		this.db = new Database(this.config.mongoURI);
+		this.start();
+		this.login(this.config.token);
 	}
 
 	/**
@@ -62,14 +69,12 @@ class Bot extends Client {
 	 * Also inits the database
 	 * @param config The config file
 	 */
-	public async start(config: Config): Promise<void> {
-		this.initLogger();
-		this.config = config;
-		this.login(this.config.token);
-
+	private async start(): Promise<void> {
 		// Sets up the database
-		this.db = new Database(this.config.mongoURI);
 		await this.db.init();
+
+		// Sets up the logger
+		this.initLogger();
 
 		// Sets the the global command handler
 		// Global commands include bxt!setup
@@ -99,6 +104,7 @@ class Bot extends Client {
 				`Registered new Event | ${file.name} | Once?${file.once}`
 			);
 		});
+
 		// Sets up Modules and adds them to the modules collection
 		const moduleFiles: string[] = await globPromise(
 			`${__dirname}/../modules/*/*Module{.js,.ts}`
@@ -115,14 +121,16 @@ class Bot extends Client {
 	 * @param message The message that the embed is replying to.
 	 * @returns {MessageEmbed} A message Embed object
 	 */
-	public embed(
+	public static embed(
 		options: MessageEmbedOptions,
 		message: Message | Interaction
 	): MessageEmbed {
 		if (message instanceof Interaction) {
 			return new MessageEmbed({ color: 'RANDOM', ...options })
 				.setFooter(
-					`${message.user.tag} | ${this.user.username} | Developed by Xmde#1337`,
+					`${message.user.tag} | ${
+						Bot.getInstance().user.username
+					} | Developed by Xmde#1337`,
 					message.user.displayAvatarURL({ format: 'png', dynamic: true })
 				)
 				.setTimestamp(Date.now());
@@ -130,7 +138,9 @@ class Bot extends Client {
 		if (message instanceof Message) {
 			return new MessageEmbed({ color: 'RANDOM', ...options })
 				.setFooter(
-					`${message.author.tag} | ${this.user.username} | Developed by Xmde#1337`,
+					`${message.author.tag} | ${
+						Bot.getInstance().user.username
+					} | Developed by Xmde#1337`,
 					message.author.displayAvatarURL({ format: 'png', dynamic: true })
 				)
 				.setTimestamp(Date.now());
@@ -143,11 +153,11 @@ class Bot extends Client {
 	 * @param message The message that the embed is replying to
 	 * @returns A message Embed object which can be passed straight into channel.send
 	 */
-	public messageEmbed(
+	public static messageEmbed(
 		options: MessageEmbedOptions,
 		message: Message
 	): MessageOptions {
-		return { embeds: [this.embed(options, message)], components: [] };
+		return { embeds: [Bot.embed(options, message)], components: [] };
 	}
 
 	/**

@@ -58,7 +58,7 @@ export default class PingCommand extends Command {
 		// Send the results
 		interaction.editReply({
 			embeds: [
-				client.embed(
+				Bot.embed(
 					{
 						description: `Roll Resaults ${rolls.join(' | ')}`,
 						title: `You Rolled ${rolls.reduce(

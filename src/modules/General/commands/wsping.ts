@@ -33,7 +33,7 @@ export default class PingCommand extends Command {
 		msg.delete();
 		interaction.reply({
 			embeds: [
-				client.embed(
+				Bot.embed(
 					{
 						description: `WebSocket: ${client.ws.ping}ms\nMessage Create: ${
 							timeCreate - time

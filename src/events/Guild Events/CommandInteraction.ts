@@ -2,6 +2,7 @@
 // Prints out a ready command to the console.
 
 import { CommandInteraction, Interaction } from 'discord.js';
+import { Bot } from '../../client/Client';
 import { DBModGuild } from '../../database/models/ModGuild';
 import { Command } from '../../interfaces/Command';
 import { RunFunction } from '../../interfaces/Event';
@@ -46,7 +47,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 		interaction.reply({
 			ephemeral: true,
 			embeds: [
-				client.embed(
+				Bot.embed(
 					{
 						description: 'This module is disabled in this server.',
 						color: 'RED',
@@ -61,7 +62,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 		interaction.reply({
 			ephemeral: true,
 			embeds: [
-				client.embed(
+				Bot.embed(
 					{
 						description: 'This command is disabled in this server.',
 						color: 'RED',

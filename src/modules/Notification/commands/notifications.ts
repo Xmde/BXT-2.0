@@ -62,7 +62,7 @@ export default class PingCommand extends Command {
 		if (!discordChannel || discordChannel === '' || !role || role === '') {
 			interaction.reply({
 				embeds: [
-					client.embed(
+					Bot.embed(
 						{
 							description:
 								'You must configue this module first! Run bxt!setup and naviagate to the notification module',
@@ -91,10 +91,7 @@ export default class PingCommand extends Command {
 			await Notification.addGuild(interaction.guild.id);
 			interaction.reply({
 				embeds: [
-					client.embed(
-						{ description: 'Channel Successfully Added' },
-						interaction
-					),
+					Bot.embed({ description: 'Channel Successfully Added' }, interaction),
 				],
 				ephemeral: true,
 			});
@@ -105,7 +102,7 @@ export default class PingCommand extends Command {
 			await Notification.removeGuild(interaction.guild.id);
 			interaction.reply({
 				embeds: [
-					client.embed(
+					Bot.embed(
 						{ description: 'Channel Successfully Removed' },
 						interaction
 					),

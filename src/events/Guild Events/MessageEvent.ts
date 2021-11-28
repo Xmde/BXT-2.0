@@ -3,6 +3,7 @@
 // Global commands do NOT use the slash command handler with interactions
 
 import { Message } from 'discord.js';
+import { Bot } from '../../client/Client';
 import { GlobalCommand } from '../../interfaces/Command';
 import { RunFunction } from '../../interfaces/Event';
 
@@ -36,7 +37,7 @@ export const run: RunFunction = async (client, message: Message) => {
 	);
 	command.run(client, message, args).catch((reason: any) => {
 		message.channel.send({
-			embeds: [client.embed({ description: `An Error Occured!` }, message)],
+			embeds: [Bot.embed({ description: `An Error Occured!` }, message)],
 		});
 		client.logger.error(`Error Occured durring Command! | ${reason}`);
 	});
