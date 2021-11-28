@@ -25,6 +25,8 @@ const globPromise = promisify(glob);
  * Custom class that entends the default discord.js Client
  */
 class Bot extends Client {
+	private static instance: Bot;
+
 	public logger: Consola = consola;
 	public events: Collection<string, Event> = new Collection();
 	public modules: Collection<string, BotModule> = new Collection();
@@ -32,8 +34,20 @@ class Bot extends Client {
 	public db: Database;
 	public config: Config;
 
+	/**
+	 * The bot class is a singleton class.
+	 * This method returns the instance of the bot class
+	 * @returns The instance of the bot
+	 */
+	public static getInstance(): Bot {
+		if (!this.instance) {
+			this.instance = new Bot();
+		}
+		return this.instance;
+	}
+
 	//Sets up the discord bot
-	public constructor() {
+	private constructor() {
 		super({
 			intents: [
 				Intents.FLAGS.GUILDS,
