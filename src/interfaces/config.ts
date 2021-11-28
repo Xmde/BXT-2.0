@@ -9,5 +9,6 @@ export interface Config {
 	youtube: {
 		callbackurl: string;
 		callbackport: number;
+		apiKey: string;
 	};
 }

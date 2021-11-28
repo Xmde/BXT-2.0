@@ -167,10 +167,12 @@ export abstract class Command extends Setable {
 	}
 
 	public static getCommand(client: Bot, name: string) {
+		if (!client.modules.some((m) => m.commands.some((c) => c.name === name)))
+			return null;
 		return client.modules
 			.filter((m) => (m.commands.get(name) ? true : false))
 			.first()
-			.commands.get(name);
+			.commands?.get(name);
 	}
 
 	public async isEnabled(client: Bot, guild: Guild): Promise<boolean> {

@@ -44,6 +44,7 @@ abstract class BotModule extends Setable {
 		const commands: Collection<string, Command> = new Collection();
 		const commandFiles = glob.sync(`${this.dirname}/commands/*{.ts,.js}`);
 		commandFiles.forEach(async (file: string) => {
+			Bot.getInstance().logger.trace(file);
 			const command: Command = new (require(file).default)(this);
 			commands.set(command.name, command);
 		});

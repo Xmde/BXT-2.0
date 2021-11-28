@@ -30,7 +30,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 
 	// Pulls info from the Database
 	const command: Command = Command.getCommand(client, interaction.commandName);
-	const module: BotModule = command.module;
+	const module: BotModule = command?.module;
 	const ModGuildSchema = client.db.load('modguild');
 	const ModGuild: DBModGuild = await ModGuildSchema.findOne({
 		guildID: interaction.guild.id,
@@ -42,7 +42,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 
 	// Checks to see if the module and command is enabled.
 	// If not then sends a message to the user and removes the /command from discord.
-	if (!ModGuild.getModule(module.name).enabled) {
+	if (!ModGuild.getModule(module?.name)?.enabled) {
 		module.disable(client, interaction.guild);
 		interaction.reply({
 			ephemeral: true,
@@ -57,7 +57,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 			],
 		});
 	}
-	if (!ModGuild.getCommand(module.name, command.name).enabled) {
+	if (!ModGuild.getCommand(module?.name, command?.name)?.enabled) {
 		command.disable(client, interaction.guild);
 		interaction.reply({
 			ephemeral: true,

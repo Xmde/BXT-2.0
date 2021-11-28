@@ -9,11 +9,13 @@ import { DBModGuild } from '../../database/models/ModGuild';
 import { NewsChannel, TextChannel } from 'discord.js';
 import pubSubHubbub from 'pubsubhubbub';
 import xml2js from 'xml2js';
+import { google } from 'googleapis';
 
 export default class NotificationModule extends BotModule {
 	private NotifSchema: Model<DBNotification>;
 	private ModGuildSchema: Model<DBModGuild>;
 	private twitchApi: TwitchApi;
+	private youtubeApi;
 	private client: Bot;
 	private pubSubSubscriber;
 
@@ -39,6 +41,10 @@ export default class NotificationModule extends BotModule {
 		this.twitchApi = new TwitchApi({
 			client_id: client.config.twitch.clientID,
 			client_secret: client.config.twitch.clientSecret,
+		});
+		this.youtubeApi = google.youtube({
+			version: 'v3',
+			auth: client.config.youtube.apiKey,
 		});
 		this.pubSubSubscriber = pubSubHubbub.createServer({
 			callbackUrl: client.config.youtube.callbackurl,
@@ -135,12 +141,6 @@ https://twitch.tv/${stream.user_name.toLowerCase()}`);
 		);
 	}
 
-	private renew(channels: string[]) {
-		for (const channel of channels) {
-			this.subscribe(channel);
-		}
-	}
-
 	private initYoutube() {
 		this.pubSubSubscriber.on('feed', async (feed) => {
 			const data = await xml2js.parseStringPromise(feed.feed.toString(), {
@@ -178,5 +178,24 @@ https://twitch.tv/${stream.user_name.toLowerCase()}`);
 				}
 			}
 		});
+		setInterval(() => {
+			this.NotifSchema.find({ platform: 'YOUTUBE' }).then((channels) => {
+				channels.forEach((channel) => {
+					this.subscribe(channel.channel);
+				});
+			});
+		}, 1000 * 60 * 60 * 24 * 2);
+	}
+
+	/**
+	 * @param id The id of the channel
+	 * @returns The Name of the Channel
+	 */
+	public async getNameFromId(id: string): Promise<string> {
+		const data = await this.youtubeApi.channels.list({
+			id: id,
+			part: 'snippet',
+		});
+		return data.data.items[0].snippet.title;
 	}
 }
