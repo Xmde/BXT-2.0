@@ -4,6 +4,9 @@
 import { GlobalRunFunction } from '../interfaces/Command';
 import { setUpGuild } from '../events/Guild Events/GuildJoin';
 import { SetupMenu } from '../interfaces/SetupMenu';
+import { Message } from 'discord.js';
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const name: string = 'setup';
 
@@ -17,5 +20,23 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 		);
 	}
 	setUpGuild(client, message.guildId);
-	new SetupMenu(client, message).run();
+	const setupMenu = SetupMenu.getInstance(client, message);
+	if (setupMenu) setupMenu.run();
+	else {
+		message.channel
+			.send(
+				client.messageEmbed(
+					{
+						description: 'A Setup Menu is already open for this Server!',
+						color: '#ff0000',
+					},
+					message
+				)
+			)
+			.then(async (msg: Message) => {
+				await delay(5000);
+				msg.delete();
+			});
+		message.delete();
+	}
 };

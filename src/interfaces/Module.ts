@@ -3,10 +3,11 @@ import { Command } from './Command';
 import glob from 'glob';
 import { Bot } from '../client/Client';
 import { DBModGuild } from '../database/models/ModGuild';
+import { Setable } from './Setable';
 
 // Class for BotModlues.
 // Will grab the commands in the commands folder.
-abstract class BotModule {
+abstract class BotModule extends Setable {
 	public readonly name: string;
 	public readonly displyName: string;
 	public info: string;
@@ -25,9 +26,9 @@ abstract class BotModule {
 			`Disabled module ${this.displyName} for guild ${guild.name}`
 		);
 	}
-	public defaultSettings: Collection<string, any> = new Collection();
 
 	public constructor(name: string, dirname: string) {
+		super();
 		this.name = name;
 		this.dirname = dirname;
 		this.displyName = name.charAt(0).toUpperCase() + name.slice(1);

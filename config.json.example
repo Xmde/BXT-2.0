@@ -1,4 +1,8 @@
 {
   "token": "",
-  "mongoURI": ""
+  "mongoURI": "",
+  "twitch": {
+		"clientID": "",
+		"clientSecret": ""
+	}
 }

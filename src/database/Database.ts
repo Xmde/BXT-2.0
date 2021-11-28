@@ -15,10 +15,9 @@ class Database {
 	private models: Collection<string, Model<any>> = new Collection();
 	public constructor(mongoURI: string) {
 		mongoose.connect(mongoURI);
-		this.init();
 	}
 
-	private async init(): Promise<void> {
+	public async init(): Promise<void> {
 		const modelFiles = await globPromise(`${__dirname}/models/*{.ts,.js}`);
 		modelFiles.forEach(async (value: string) => {
 			const model = await import(value);

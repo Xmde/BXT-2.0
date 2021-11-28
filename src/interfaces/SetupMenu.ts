@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 import {
+	ApplicationCommand,
 	ButtonInteraction,
+	Collection as DiscordCollection,
 	Interaction,
 	InteractionCollector,
 	Message,
@@ -10,6 +12,7 @@ import {
 	MessageSelectMenu,
 	SelectMenuInteraction,
 } from 'discord.js';
+import { Collection } from 'mongoose';
 import { Bot } from '../client/Client';
 import {
 	DBCommand,
@@ -46,7 +49,20 @@ export class SetupMenu {
 
 	private gracefullExit: boolean = false;
 
-	constructor(client: Bot, message: Message) {
+	private optionCommand: ApplicationCommand;
+
+	private static instances: DiscordCollection<string, SetupMenu>;
+
+	public static getInstance(client: Bot, message: Message) {
+		if (!this.instances) this.instances = new DiscordCollection();
+		const instance = this.instances.get(message.guildId);
+		if (instance) return null;
+		const newInstance = new SetupMenu(client, message);
+		this.instances.set(message.guildId, newInstance);
+		return newInstance;
+	}
+
+	private constructor(client: Bot, message: Message) {
 		this.client = client;
 		this.userMessage = message;
 		this.user = message.author.id;
@@ -65,6 +81,8 @@ export class SetupMenu {
 		this.startListenerCommandEnable();
 		this.startListenerCommandPermission();
 		this.startListenerPermissionSelectMenu();
+		this.startListenerModuleSettingsButtons();
+		this.startListenerCommandSettingsButtons();
 	}
 
 	private initCollectors() {
@@ -112,6 +130,17 @@ export class SetupMenu {
 			this.permissionSelectionMenuCollector.resetTimer();
 		});
 		this.timeoutCollector.on('end', async () => {
+			SetupMenu.instances.delete(this.message.guildId);
+			this.moduleActionRowCollector.stop();
+			this.moduleSettingsButtonsCollector.stop();
+			this.commandActionRowCollector.stop();
+			this.commandSettingsButtonsCollector.stop();
+			this.timeoutCollector.stop();
+			this.commandSettingsPermissionCollector.stop();
+			this.permissionSelectionMenuCollector.stop();
+
+			if (this.optionCommand instanceof ApplicationCommand)
+				this.optionCommand.delete();
 			if (this.gracefullExit) return;
 			this.message.edit({
 				content: 'BXT SETUP MENU TIMED OUT',
@@ -151,14 +180,29 @@ export class SetupMenu {
 				this.moduleActionRow = this.createModuleActionRow(module.name);
 				this.commandActionRow = this.createCommandActionRow();
 				this.commandSettingsButtons = null;
-				this.moduleSettingsButtons = this.createButtonOptions([
-					{
-						customId: 'module-enabled-button',
-						style: (await this.moduleEnabled()) ? 'SUCCESS' : 'DANGER',
-						label: (await this.moduleEnabled()) ? 'ENABLED' : 'DISABLED',
-						disabled: false,
-					},
-				]);
+				this.moduleSettingsButtons = this.createButtonOptions(
+					this.module.getDefaultSettings().reduce(
+						(acc, _, key) => {
+							acc.push({
+								customId: `module-option-${key}`,
+								style: 'SECONDARY',
+								label: key.toUpperCase(),
+								disabled: false,
+							});
+							return acc;
+						},
+						[
+							{
+								customId: 'module-enabled-button',
+								style:
+									((await this.moduleEnabled()) ? 'SUCCESS' : 'DANGER') ||
+									'SECONDARY',
+								label: (await this.moduleEnabled()) ? 'ENABLED' : 'DISABLED',
+								disabled: false,
+							},
+						]
+					)
+				);
 				this.message.edit({
 					content: 'BXT SETUP MENU',
 					components: [
@@ -180,29 +224,59 @@ export class SetupMenu {
 					await this.module.disable(this.client, this.userMessage.guild);
 				else await this.module.enable(this.client, this.userMessage.guild);
 
-				this.moduleSettingsButtons = this.createButtonOptions([
-					{
-						customId: 'module-enabled-button',
-						style: (await this.moduleEnabled()) ? 'SUCCESS' : 'DANGER',
-						label: (await this.moduleEnabled()) ? 'ENABLED' : 'DISABLED',
-						disabled: false,
-					},
-				]);
+				this.moduleSettingsButtons = this.createButtonOptions(
+					this.module.getDefaultSettings().reduce(
+						(acc, _, key) => {
+							acc.push({
+								customId: `module-option-${key}`,
+								style: 'SECONDARY',
+								label: key.toUpperCase(),
+								disabled: false,
+							});
+							return acc;
+						},
+						[
+							{
+								customId: 'module-enabled-button',
+								style:
+									((await this.moduleEnabled()) ? 'SUCCESS' : 'DANGER') ||
+									'SECONDARY',
+								label: (await this.moduleEnabled()) ? 'ENABLED' : 'DISABLED',
+								disabled: false,
+							},
+						]
+					)
+				);
 				if (this.commandSettingsButtons) {
-					this.commandSettingsButtons = this.createButtonOptions([
-						{
-							customId: 'command-enabled-button',
-							style: (await this.commandEnabled()) ? 'SUCCESS' : 'DANGER',
-							label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
-							disabled: false,
-						},
-						{
-							customId: 'command-permission-button',
-							style: 'PRIMARY',
-							label: 'PERMISSIONS',
-							disabled: false,
-						},
-					]);
+					this.commandSettingsButtons = this.createButtonOptions(
+						this.command.getDefaultSettings().reduce(
+							(acc, _, key) => {
+								acc.push({
+									customId: `command-option-${key}`,
+									style: 'SECONDARY',
+									label: key.toUpperCase(),
+									disabled: false,
+								});
+								return acc;
+							},
+							[
+								{
+									customId: 'command-enabled-button',
+									style: (await this.commandEnabled())
+										? 'SUCCESS'
+										: 'DANGER' || 'SECONDARY',
+									label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
+									disabled: false,
+								},
+								{
+									customId: 'command-permission-button',
+									style: 'PRIMARY',
+									label: 'PERMISSIONS',
+									disabled: false,
+								},
+							]
+						)
+					);
 					this.message.edit({
 						content: 'BXT SETUP MENU',
 						components: [
@@ -237,20 +311,35 @@ export class SetupMenu {
 				if (!command) return;
 				this.command = command;
 				this.commandActionRow = this.createCommandActionRow(command.name);
-				this.commandSettingsButtons = this.createButtonOptions([
-					{
-						customId: 'command-enabled-button',
-						style: (await this.commandEnabled()) ? 'SUCCESS' : 'DANGER',
-						label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
-						disabled: false,
-					},
-					{
-						customId: 'command-permission-button',
-						style: 'PRIMARY',
-						label: 'PERMISSIONS',
-						disabled: false,
-					},
-				]);
+				this.commandSettingsButtons = this.createButtonOptions(
+					this.command.getDefaultSettings().reduce(
+						(acc, _, key) => {
+							acc.push({
+								customId: `command-option-${key}`,
+								style: 'SECONDARY',
+								label: key.toUpperCase(),
+								disabled: false,
+							});
+							return acc;
+						},
+						[
+							{
+								customId: 'command-enabled-button',
+								style: (await this.commandEnabled())
+									? 'SUCCESS'
+									: 'DANGER' || 'SECONDARY',
+								label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
+								disabled: false,
+							},
+							{
+								customId: 'command-permission-button',
+								style: 'PRIMARY',
+								label: 'PERMISSIONS',
+								disabled: false,
+							},
+						]
+					)
+				);
 				this.message.edit({
 					content: 'BXT SETUP MENU',
 					components: [
@@ -274,20 +363,35 @@ export class SetupMenu {
 					await this.command.disable(this.client, this.userMessage.guild);
 				else await this.command.enable(this.client, this.userMessage.guild);
 
-				this.commandSettingsButtons = this.createButtonOptions([
-					{
-						customId: 'command-enabled-button',
-						style: (await this.commandEnabled()) ? 'SUCCESS' : 'DANGER',
-						label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
-						disabled: false,
-					},
-					{
-						customId: 'command-permission-button',
-						style: 'PRIMARY',
-						label: 'PERMISSIONS',
-						disabled: false,
-					},
-				]);
+				this.commandSettingsButtons = this.createButtonOptions(
+					this.command.getDefaultSettings().reduce(
+						(acc, _, key) => {
+							acc.push({
+								customId: `command-option-${key}`,
+								style: 'SECONDARY',
+								label: key.toUpperCase(),
+								disabled: false,
+							});
+							return acc;
+						},
+						[
+							{
+								customId: 'command-enabled-button',
+								style: (await this.commandEnabled())
+									? 'SUCCESS'
+									: 'DANGER' || 'SECONDARY',
+								label: (await this.commandEnabled()) ? 'ENABLED' : 'DISABLED',
+								disabled: false,
+							},
+							{
+								customId: 'command-permission-button',
+								style: 'PRIMARY',
+								label: 'PERMISSIONS',
+								disabled: false,
+							},
+						]
+					)
+				);
 				this.message.edit({
 					content: 'BXT SETUP MENU',
 					components: [
@@ -369,6 +473,180 @@ export class SetupMenu {
 				});
 			}
 		);
+	}
+
+	private startListenerModuleSettingsButtons() {
+		this.timeoutCollector.on('collect', async (i: Interaction) => {
+			if (!(i instanceof ButtonInteraction)) return;
+			if (!i.customId.includes('module-option')) return;
+			const option = i.customId.split('-')[2];
+			this.optionCommand = await i.guild.commands.create(
+				this.module.getSettingCommands().get(option).toJSON()
+			);
+			this.optionCommand.permissions.add({
+				permissions: [
+					{
+						type: 'USER',
+						id: i.user.id,
+						permission: true,
+					},
+				],
+			});
+			i.update({
+				components: [],
+				content: 'BXT SETUP MENU',
+				embeds: [
+					this.client.embed(
+						{
+							description:
+								'Please run /setting to edit the setting. You have 30 seconds',
+						},
+						i
+					),
+				],
+			});
+			this.commandModuleListener();
+		});
+	}
+
+	private startListenerCommandSettingsButtons() {
+		this.timeoutCollector.on('collect', async (i: Interaction) => {
+			if (!(i instanceof ButtonInteraction)) return;
+			if (!i.customId.includes('command-option')) return;
+			const option = i.customId.split('-')[2];
+			this.optionCommand = await i.guild.commands.create(
+				this.command.getSettingCommands().get(option).toJSON()
+			);
+			this.optionCommand.permissions.add({
+				permissions: [
+					{
+						type: 'USER',
+						id: i.user.id,
+						permission: true,
+					},
+				],
+			});
+			i.update({
+				components: [],
+				content: 'BXT SETUP MENU',
+				embeds: [
+					this.client.embed(
+						{
+							description:
+								'Please run /setting to edit the setting. You have 30 seconds',
+						},
+						i
+					),
+				],
+			});
+			this.commandCommandListener();
+		});
+	}
+
+	private commandModuleListener() {
+		this.client.once('interactionCreate', async (i: Interaction) => {
+			if (i.isCommand() && i.commandName === 'setting') {
+				this.timeoutCollector.emit('collect', i);
+
+				const ModGuildSchema = this.client.db.load('modguild');
+				const ModGuild: DBModGuild = await ModGuildSchema.findOne({
+					guildId: i.guildId,
+				});
+				if (
+					ModGuild.getModule(this.module.name).settings.some(
+						(s) => s.key === i.options.data[0].name
+					)
+				)
+					ModGuild.getModule(this.module.name).settings.find(
+						(s) => s.key === i.options.data[0].name
+					).value = i.options.data[0];
+				else
+					ModGuild.getModule(this.module.name).settings.push({
+						key: i.options.data[0].name,
+						value: i.options.data[0],
+					});
+				await ModGuild.save();
+				i.reply({
+					content: 'Setting updated Successfully',
+				});
+				await delay(1000);
+				i.deleteReply();
+				this.optionCommand.delete();
+				this.optionCommand = null;
+				if (this.commandSettingsButtons) {
+					this.message.edit({
+						content: 'BXT SETUP MENU',
+						components: [
+							this.moduleActionRow,
+							this.moduleSettingsButtons,
+							this.commandActionRow,
+							this.commandSettingsButtons,
+						],
+						embeds: [],
+					});
+				} else {
+					this.message.edit({
+						content: 'BXT SETUP MENU',
+						components: [
+							this.moduleActionRow,
+							this.moduleSettingsButtons,
+							this.commandActionRow,
+						],
+						embeds: [],
+					});
+				}
+			}
+		});
+	}
+
+	private commandCommandListener() {
+		this.client.once('interactionCreate', async (i: Interaction) => {
+			if (i.isCommand() && i.commandName === 'setting') {
+				this.timeoutCollector.emit('collect', i);
+
+				const ModGuildSchema = this.client.db.load('modguild');
+				const ModGuild: DBModGuild = await ModGuildSchema.findOne({
+					guildId: i.guildId,
+				});
+				if (
+					ModGuild.getCommand(
+						this.module.name,
+						this.command.name
+					).settings.some((s) => s.key === i.options.data[0].name)
+				)
+					ModGuild.getCommand(
+						this.module.name,
+						this.command.name
+					).settings.find((s) => s.key === i.options.data[0].name).value =
+						i.options.data[0];
+				else
+					ModGuild.getCommand(
+						this.module.name,
+						this.command.name
+					).settings.push({
+						key: i.options.data[0].name,
+						value: i.options.data[0],
+					});
+				await ModGuild.save();
+				i.reply({
+					content: 'Setting updated Successfully',
+				});
+				await delay(1000);
+				i.deleteReply();
+				this.optionCommand.delete();
+				this.optionCommand = null;
+				this.message.edit({
+					content: 'BXT SETUP MENU',
+					components: [
+						this.moduleActionRow,
+						this.moduleSettingsButtons,
+						this.commandActionRow,
+						this.commandSettingsButtons,
+					],
+					embeds: [],
+				});
+			}
+		});
 	}
 
 	private createModuleActionRow(

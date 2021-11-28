@@ -16,7 +16,9 @@ _Italics_ - Low Priority
 
 - [ ] _Comeup with more modules and commands for thoes modules_
 
-- [ ] Implement Socials into the bot
+- [x] Implement Socials into the bot
+
+- [ ] Add utility commands for Notifications (See what channels etc)
 
 - [ ] _Implement a music bot into the framework._
 
@@ -26,7 +28,7 @@ _Italics_ - Low Priority
 
 - [x] _Figure out a solution for options in the setup menu_
 
-- [ ] _Implement solution for options in the setup menu_ (Regestering a temporary command when the user clicks the button. Will allow for better options handeling)
+- [x] _Implement solution for options in the setup menu_ (Regestering a temporary command when the user clicks the button. Will allow for better options handeling)
 
 ## Other
 

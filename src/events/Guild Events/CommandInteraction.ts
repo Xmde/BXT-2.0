@@ -13,6 +13,7 @@ export const once: boolean = false;
 export const run: RunFunction = async (client, interaction: Interaction) => {
 	if (!interaction.isCommand()) return;
 	interaction as CommandInteraction;
+	if (interaction.commandName === 'setting') return;
 	const command: Command = Command.getCommand(client, interaction.commandName);
 	const module: BotModule = command.module;
 	const ModGuildSchema = client.db.load('modguild');

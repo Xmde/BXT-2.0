@@ -13,6 +13,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { DBModGuild, DBPermission } from '../database/models/ModGuild';
 import { BotModule } from './Module';
 import consolaGlobalInstance from 'consola';
+import { Setable } from './Setable';
 
 export interface GlobalRunFunction {
 	(client: Bot, message: Message, args: string[]): Promise<unknown>;
@@ -23,7 +24,7 @@ export interface GlobalCommand {
 	run: GlobalRunFunction;
 }
 
-export abstract class Command {
+export abstract class Command extends Setable {
 	public permissions: DBPermission[] = [
 		{ type: 'USER', id: '125270885782388736', permission: true },
 	];
@@ -33,7 +34,6 @@ export abstract class Command {
 	public info: string;
 	public module: BotModule;
 
-	public defaultSettings: Collection<string, any> = new Collection();
 	public data: SlashCommandBuilder =
 		new SlashCommandBuilder().setDefaultPermission(false);
 
@@ -62,6 +62,7 @@ export abstract class Command {
 		info: string;
 		module: BotModule;
 	}) {
+		super();
 		this.name = name;
 		this.displayName = name.charAt(0).toUpperCase() + name.slice(1);
 		this.help = help;

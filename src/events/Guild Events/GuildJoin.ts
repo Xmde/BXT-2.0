@@ -42,7 +42,9 @@ export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 			name: module.name,
 			commands: [],
 			enabled: false,
-			settings: module.defaultSettings.map((value, key) => ({ key, value })),
+			settings: module
+				.getDefaultSettings()
+				.map((value, key) => ({ key, value: { name: key, type: '', value } })),
 		});
 	});
 
@@ -53,7 +55,10 @@ export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 				name: command.name,
 				permissions: command.permissions,
 				enabled: false,
-				settings: command.defaultSettings.map((value, key) => ({ key, value })),
+				settings: command.getDefaultSettings().map((value, key) => ({
+					key,
+					value: { name: key, type: '', value },
+				})),
 				commandId: '',
 			});
 		});

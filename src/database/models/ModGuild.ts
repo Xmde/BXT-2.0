@@ -6,8 +6,17 @@ import { Document, model, Schema } from 'mongoose';
 export interface DBModGuild extends Document {
 	guildId: string;
 	modules: DBModule[];
-	getModule: (name: string) => DBModule | undefined;
-	getCommand: (moduleName: string, name: string) => DBCommand | undefined;
+	getModule: (moduleName: string) => DBModule | undefined;
+	getCommand: (
+		moduleName: string,
+		commandName: string
+	) => DBCommand | undefined;
+	getModuleSettings: (name: string, key: string) => DBSetting | undefined;
+	getCommandSettings: (
+		moduleName: string,
+		commandName: string,
+		key: string
+	) => DBSetting | undefined;
 }
 
 export interface DBSetting {
@@ -79,6 +88,29 @@ ModGuildSchema.methods.getCommand = function (
 	const module = this.getModule(moduleName);
 	if (!module) return undefined;
 	return module.commands.find((c) => c.name === name);
+};
+
+ModGuildSchema.methods.getModuleSettings = function (
+	moduleNmae: string,
+	key: string
+): any {
+	const module = this.getModule(moduleNmae);
+	if (!module) return undefined;
+	const setting = module.settings.find((s) => s.key === key);
+	if (!setting) return undefined;
+	return setting;
+};
+
+ModGuildSchema.methods.getCommandSettings = function (
+	moduleName: string,
+	commandName: string,
+	key: string
+): any {
+	const command = this.getCommand(moduleName, commandName);
+	if (!command) return undefined;
+	const setting = command.settings.find((s) => s.key === key);
+	if (!setting) return undefined;
+	return setting;
 };
 
 export const Model = model<DBModGuild>('modguild', ModGuildSchema);

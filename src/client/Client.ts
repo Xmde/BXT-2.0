@@ -48,6 +48,10 @@ class Bot extends Client {
 		this.config = config;
 		this.login(this.config.token);
 
+		// Sets up the database
+		this.db = new Database(this.config.mongoURI);
+		await this.db.init();
+
 		// Sets the the global command handler
 		// Global commands include bxt!setup
 		// Global commands are NOT modulized commands
@@ -84,8 +88,6 @@ class Bot extends Client {
 			const module: BotModule = new (await import(value)).default(this);
 			this.modules.set(module.name, module);
 		});
-		// Sets up the database
-		this.db = new Database(this.config.mongoURI);
 	}
 
 	// Function to allow easier embeding messages.

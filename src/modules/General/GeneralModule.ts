@@ -2,6 +2,7 @@
 import { Bot } from '../../client/Client';
 import { BotModule } from '../../interfaces/Module';
 import { Collection } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 export default class GeneralModule extends BotModule {
 	constructor(client: Bot) {
