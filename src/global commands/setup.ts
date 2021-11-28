@@ -37,7 +37,7 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 	// Must be the guild owner to run this command.
 	if (message.guild.ownerId !== message.author.id) {
 		message.channel.send(
-			client.messageEmbed(
+			Bot.messageEmbed(
 				{ description: 'You must be the Guild Owner to run this Command!' },
 				message
 			)
@@ -53,7 +53,7 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 	else {
 		message.channel
 			.send(
-				client.messageEmbed(
+				Bot.messageEmbed(
 					{
 						description: 'A Setup Menu is already open for this Server!',
 						color: '#ff0000',
@@ -197,7 +197,7 @@ class SetupMenu {
 				components: [],
 			});
 			this.message.edit(
-				this.client.messageEmbed(
+				Bot.messageEmbed(
 					{
 						title: 'BXT SETUP MENU TIMED OUT',
 						description: "THIS MENU WILL AUTOMATICLY DELETE IT'S SELF",
@@ -482,7 +482,7 @@ class SetupMenu {
 				];
 				i.deferUpdate();
 				this.message.edit(
-					this.client.messageEmbed(
+					Bot.messageEmbed(
 						{ description: 'PERMISSIONS UPDATED SECUSFULLY', color: 'GREEN' },
 						this.userMessage
 					)
@@ -546,7 +546,7 @@ class SetupMenu {
 				components: [],
 				content: 'BXT SETUP MENU',
 				embeds: [
-					this.client.embed(
+					Bot.embed(
 						{
 							description:
 								'Please run /setting to edit the setting. You have 30 seconds',
@@ -580,7 +580,7 @@ class SetupMenu {
 				components: [],
 				content: 'BXT SETUP MENU',
 				embeds: [
-					this.client.embed(
+					Bot.embed(
 						{
 							description:
 								'Please run /setting to edit the setting. You have 30 seconds',

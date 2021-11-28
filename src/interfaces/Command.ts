@@ -24,6 +24,12 @@ export interface GlobalCommand {
 	run: GlobalRunFunction;
 }
 
+/**
+ * Commands are setable because it means they have options
+ * I know setable is a bad name but I couldn't think of a better one
+ * I'm sorry
+ * Is an abstract class used to making commands.
+ */
 export abstract class Command extends Setable {
 	public permissions: DBPermission[] = [
 		{ type: 'USER', id: '125270885782388736', permission: true },
