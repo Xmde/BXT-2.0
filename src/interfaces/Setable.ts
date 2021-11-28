@@ -1,6 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Collection } from 'discord.js';
 
+/**
+ * Allows things have settings/options in the database
+ * Used by Command and Modules.
+ */
 export abstract class Setable {
 	private defaultSettings: Collection<string, any> = new Collection();
 	private settingCommands: Collection<string, SlashCommandBuilder> =

@@ -5,8 +5,12 @@ import { Bot } from '../client/Client';
 import { DBModGuild } from '../database/models/ModGuild';
 import { Setable } from './Setable';
 
-// Class for BotModlues.
-// Will grab the commands in the commands folder.
+/**
+ * Class for every module
+ * Extend this class to create a module.
+ * Setable means that you can set the module's settings in the database.
+ * Its a bad name... I know.
+ */
 abstract class BotModule extends Setable {
 	public readonly name: string;
 	public readonly displyName: string;

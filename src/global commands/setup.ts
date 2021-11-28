@@ -34,6 +34,7 @@ const timeout = 45000;
 export const name: string = 'setup';
 
 export const run: GlobalRunFunction = async (client, message, _) => {
+	// Must be the guild owner to run this command.
 	if (message.guild.ownerId !== message.author.id) {
 		message.channel.send(
 			client.messageEmbed(
@@ -42,7 +43,11 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 			)
 		);
 	}
+	// Sets up the Databese for the guild.
 	setUpGuild(client, message.guildId);
+	// Runs the setup menu.
+	// The setup menu is designed as a singleton for each guild.
+	// Only one instance of the menu can be made per guild at a time.
 	const setupMenu = SetupMenu.getInstance(client, message);
 	if (setupMenu) setupMenu.run();
 	else {
@@ -64,6 +69,13 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 	}
 };
 
+/**
+ * Class for the Setup Menu
+ * Is a like a singleton for each guild.
+ * WARNING: This class is not meant to be used outside of the setup command.
+ * WARNING: This code is really garbage and contains no comments. Only look below if you are brave.
+ * THIS WAS A NIGHTMARE TO MAKE.
+ */
 class SetupMenu {
 	private client: Bot;
 	private userMessage: Message;

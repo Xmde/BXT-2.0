@@ -1,8 +1,17 @@
+/**
+ * Sets up the MOdule Guild Schema Model for the database
+ * The ModGuild Model nests different schemsa for modules and commands.
+ * Each Module has a collection of commands.
+ * Modules and Commands can both be enabled and disabled by server owners.
+ */
+
 import { Document, model, Schema } from 'mongoose';
 
-// Sets up the Module Guild Schema Model for the database
-// The ModGuild Model nestes diffrent schemas for modules and commands.
-
+/**
+ * Interface for the ModGuild Schema
+ * Has a guildId and a collection of modules.
+ * Also has some utility commands for easier access to modules and commands.
+ */
 export interface DBModGuild extends Document {
 	guildId: string;
 	modules: DBModule[];
@@ -19,10 +28,17 @@ export interface DBModGuild extends Document {
 	) => DBSetting | undefined;
 }
 
+/**
+ * Interface for Settings stored in the database
+ */
 export interface DBSetting {
 	key: string;
 	value: any;
 }
+
+/**
+ * Interface for the Module Schema
+ */
 export interface DBModule {
 	name: string;
 	commands: DBCommand[];
@@ -30,6 +46,9 @@ export interface DBModule {
 	settings: DBSetting[];
 }
 
+/**
+ * Interface for the Command Schema
+ */
 export interface DBCommand {
 	name: string;
 	permissions: DBPermission[];
@@ -38,6 +57,9 @@ export interface DBCommand {
 	commandId: string;
 }
 
+/**
+ * Interface for the Permission Schema
+ */
 export interface DBPermission {
 	type: 'USER' | 'ROLE';
 	id: string;
@@ -75,12 +97,23 @@ const ModGuildSchema = new Schema<DBModGuild>({
 	modules: { type: [ModuleSchema], required: true },
 });
 
+/**
+ *
+ * @param name The name of the module to get
+ * @returns {DBModule | undefined} The module if it exists, undefined otherwise
+ */
 ModGuildSchema.methods.getModule = function (
 	name: string
 ): DBModule | undefined {
 	return this.modules.find((m) => m.name === name);
 };
 
+/**
+ *
+ * @param moduleName The name of the parrent module for the command
+ * @param name The name of the command
+ * @returns {DBCommand | undefined} The Command if it exists, undefined otherwise
+ */
 ModGuildSchema.methods.getCommand = function (
 	moduleName: string,
 	name: string
@@ -90,6 +123,12 @@ ModGuildSchema.methods.getCommand = function (
 	return module.commands.find((c) => c.name === name);
 };
 
+/**
+ *
+ * @param moduleNmae The name of the module to get settings for
+ * @param key The key of the setting to get
+ * @returns The setting if it exists, undefined otherwise
+ */
 ModGuildSchema.methods.getModuleSettings = function (
 	moduleNmae: string,
 	key: string
@@ -101,6 +140,13 @@ ModGuildSchema.methods.getModuleSettings = function (
 	return setting;
 };
 
+/**
+ *
+ * @param moduleName The name of the module to get settings for
+ * @param commandName The name of the command to get settings for
+ * @param key The key of the setting to get
+ * @returns The setting if it exists, undefined otherwise
+ */
 ModGuildSchema.methods.getCommandSettings = function (
 	moduleName: string,
 	commandName: string,

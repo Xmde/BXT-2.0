@@ -9,10 +9,14 @@ import { RunFunction } from '../../interfaces/Event';
 export const name: string = 'messageCreate';
 export const once: boolean = false;
 
-// Makes sure that the message is from a user in a guild.
-// Then runs the appropiae command which was set up in the startup in the Bot class
-// STILL NEED TO ADD PERMISSION HANDELDING
-// Takes in a client and a message.
+/**
+ * Makes sure that the message is from a user in a guild.
+ * Then runs the appropiae command which was set up in the startup in the Bot class
+ * Used for global commands
+ * @param client Bot client
+ * @param message The Message Object
+ * @returns None
+ */
 export const run: RunFunction = async (client, message: Message) => {
 	if (
 		message.author.bot ||

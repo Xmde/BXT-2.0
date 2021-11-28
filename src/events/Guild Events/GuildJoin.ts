@@ -15,6 +15,12 @@ import {
 export const name: string = 'guildCreate';
 export const once: boolean = false;
 
+/**
+ * When the bot joins a guild the guild is added to the database.
+ * Info is also logged to the console.
+ * @param client Bot client
+ * @param guild The guild that was joined
+ */
 export const run: RunFunction = async (client, guild: Guild) => {
 	const ownerTag = (await guild.fetchOwner()).user?.tag;
 	client.logger.info(
@@ -24,18 +30,22 @@ export const run: RunFunction = async (client, guild: Guild) => {
 	setUpGuild(client, guild.id);
 };
 
-// Function that gets exposed setting up a Guild with the database
-// Takes in a Client and a guildId
-// CAN be run on previosuly set up guilds.
-
+/**
+ * Sets up the Guild in the database
+ * @param client Bot client
+ * @param guildId The id of the guild that is being set up
+ */
 export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 	const ModGuildSchema = client.db.load('modguild');
 	let ModGuild: DBModGuild = await ModGuildSchema.findOne({ guildId });
+
+	// Creates the Guild if it doesnt exist.
 	if (!ModGuild) {
 		ModGuild = await ModGuildSchema.create({ guildId, modules: [] });
 	}
 	client.logger.trace(`Setting up guild | ${guildId}`);
 
+	// Goes through all the modules and sets them up.
 	client.modules.forEach((module: BotModule) => {
 		if (ModGuild.getModule(module.name)) return;
 		ModGuild.modules.push({
@@ -48,6 +58,7 @@ export async function setUpGuild(client: Bot, guildId: string): Promise<void> {
 		});
 	});
 
+	// Goes thorugh all the commands and sets them up.
 	client.modules.forEach((module: BotModule) => {
 		module.commands.forEach((command) => {
 			if (ModGuild.getCommand(module.name, command.name)) return;

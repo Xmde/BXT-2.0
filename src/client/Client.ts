@@ -21,6 +21,9 @@ import { BotModule } from '../interfaces/Module';
 // Allows to use glob with async/await
 const globPromise = promisify(glob);
 
+/**
+ * Custom class that entends the default discord.js Client
+ */
 class Bot extends Client {
 	public logger: Consola = consola;
 	public events: Collection<string, Event> = new Collection();
@@ -40,9 +43,11 @@ class Bot extends Client {
 		});
 	}
 
-	// Function that starts the bot.
-	// Also inits the global command and event handler
-	// As well as the database
+	/**
+	 * Starts the bot and inits the global command and event handler
+	 * Also inits the database
+	 * @param config The config file
+	 */
 	public async start(config: Config): Promise<void> {
 		this.initLogger();
 		this.config = config;
@@ -90,7 +95,12 @@ class Bot extends Client {
 		});
 	}
 
-	// Function to allow easier embeding messages.
+	/**
+	 * Makes an embed with a default layout
+	 * @param options The options for the embed
+	 * @param message The message that the embed is replying to.
+	 * @returns {MessageEmbed} A message Embed object
+	 */
 	public embed(
 		options: MessageEmbedOptions,
 		message: Message | Interaction
@@ -113,8 +123,12 @@ class Bot extends Client {
 		}
 	}
 
-	// Function that allows it to be inserted directly into a message
-	// Ex. channel.send(messageEmbed({ description: 'Test' }, message))
+	/**
+	 *
+	 * @param options The options for the embed
+	 * @param message The message that the embed is replying to
+	 * @returns A message Embed object which can be passed straight into channel.send
+	 */
 	public messageEmbed(
 		options: MessageEmbedOptions,
 		message: Message
@@ -122,6 +136,10 @@ class Bot extends Client {
 		return { embeds: [this.embed(options, message)], components: [] };
 	}
 
+	/**
+	 * Inits the global logger/error handler
+	 * Stores all errors in the database
+	 */
 	private initLogger(): void {
 		process.on('uncaughtException', (error) => {
 			const ErrorSchema = this.db.load('error');
