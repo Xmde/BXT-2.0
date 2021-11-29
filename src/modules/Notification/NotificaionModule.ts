@@ -198,4 +198,29 @@ https://twitch.tv/${stream.user_name.toLowerCase()}`);
 		});
 		return data.data.items[0].snippet.title;
 	}
+
+	/**
+	 *
+	 * @param channel The Channel Which we are looking for
+	 * @param platform The Platform the channel resides on
+	 * @returns True if the channel is valid, false if otherwise
+	 */
+	public async validateChannel(
+		channel: string,
+		platform: string
+	): Promise<boolean> {
+		if (platform === 'TWITCH') {
+			const data = await this.twitchApi.getUsers(channel);
+			if (!data.data[0]) return false;
+			return true;
+		} else if (platform === 'YOUTUBE') {
+			const data = await this.youtubeApi.channels.list({
+				id: channel,
+				part: 'snippet',
+			});
+			if (!data?.data?.items) return false;
+			return true;
+		}
+		return false;
+	}
 }

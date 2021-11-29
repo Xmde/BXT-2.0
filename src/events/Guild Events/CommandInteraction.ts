@@ -44,7 +44,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 	// If not then sends a message to the user and removes the /command from discord.
 	if (!ModGuild.getModule(module?.name)?.enabled) {
 		module.disable(client, interaction.guild);
-		interaction.reply({
+		return interaction.reply({
 			ephemeral: true,
 			embeds: [
 				Bot.embed(
@@ -59,7 +59,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 	}
 	if (!ModGuild.getCommand(module?.name, command?.name)?.enabled) {
 		command.disable(client, interaction.guild);
-		interaction.reply({
+		return interaction.reply({
 			ephemeral: true,
 			embeds: [
 				Bot.embed(

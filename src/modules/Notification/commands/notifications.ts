@@ -77,7 +77,23 @@ export default class PingCommand extends Command {
 		const action = interaction.options.getString('action');
 		const platform = interaction.options.getString('platform');
 		const channel = interaction.options.getString('channel');
-		const NotificationSchema = await client.db.load('notification');
+		const NotificationSchema = client.db.load('notification');
+		if (!(await this.module.validateChannel(channel, platform))) {
+			return interaction.reply({
+				embeds: [
+					Bot.embed(
+						{
+							description:
+								'That is not a valid Twitch or Youtube Channel. Please Enter a Valid Channel',
+							color: 'RED',
+						},
+						interaction
+					),
+				],
+				ephemeral: true,
+			});
+		}
+
 		let Notification: DBNotification = await NotificationSchema.findOne({
 			channel,
 		});
