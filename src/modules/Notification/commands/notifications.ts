@@ -1,3 +1,4 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, CacheType, Guild } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { DBModGuild } from '../../../database/models/ModGuild';
@@ -14,7 +15,7 @@ export default class PingCommand extends Command {
 			info: 'Used for notifications on video uploads',
 			module,
 		});
-		this.data.addStringOption((opt) =>
+		(this.data as SlashCommandBuilder).addStringOption((opt) =>
 			opt
 				.addChoices([
 					['add', 'add'],
@@ -24,7 +25,7 @@ export default class PingCommand extends Command {
 				.setDescription('The action to perform')
 				.setRequired(true)
 		);
-		this.data.addStringOption((opt) =>
+		(this.data as SlashCommandBuilder).addStringOption((opt) =>
 			opt
 				.addChoices([
 					['twitch', 'TWITCH'],
@@ -34,7 +35,7 @@ export default class PingCommand extends Command {
 				.setDescription('The platform to check for notifications')
 				.setRequired(true)
 		);
-		this.data.addStringOption((opt) =>
+		(this.data as SlashCommandBuilder).addStringOption((opt) =>
 			opt
 				.setName('channel')
 				.setDescription('The channel to check for notifications')

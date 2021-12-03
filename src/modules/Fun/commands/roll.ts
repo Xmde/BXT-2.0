@@ -1,9 +1,8 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, CacheType, Guild } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
 import { BotModule } from '../../../interfaces/Module';
-
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export default class PingCommand extends Command {
 	constructor(module: BotModule) {
@@ -13,7 +12,7 @@ export default class PingCommand extends Command {
 			info: 'Rolls a Dice',
 			module,
 		});
-		this.data
+		(this.data as SlashCommandBuilder)
 			.addIntegerOption((dice) => {
 				return dice
 					.setName('dice')
@@ -47,7 +46,7 @@ export default class PingCommand extends Command {
 		interaction: CommandInteraction<CacheType>
 	): Promise<void> {
 		interaction.deferReply({ ephemeral: true });
-		await delay(Math.floor(Math.random() * 1000) + 1000);
+		await Bot.delay(Math.floor(Math.random() * 1000) + 1000);
 		const sides = interaction.options.getInteger('sides') | 6;
 		const dice = interaction.options.getInteger('dice') | 1;
 		// Roll the dice

@@ -7,9 +7,13 @@ import {
 	Collection,
 	Guild,
 	ApplicationCommandPermissions,
+	ContextMenuInteraction,
 } from 'discord.js';
 import { Bot } from '../client/Client';
-import { SlashCommandBuilder } from '@discordjs/builders';
+import {
+	ContextMenuCommandBuilder,
+	SlashCommandBuilder,
+} from '@discordjs/builders';
 import { DBModGuild, DBPermission } from '../database/models/ModGuild';
 import { BotModule } from './Module';
 import consolaGlobalInstance from 'consola';
@@ -40,12 +44,12 @@ export abstract class Command extends Setable {
 	public info: string;
 	public module: BotModule;
 
-	public data: SlashCommandBuilder =
+	public data: SlashCommandBuilder | ContextMenuCommandBuilder =
 		new SlashCommandBuilder().setDefaultPermission(false);
 
 	public abstract run(
 		client: Bot,
-		interaction: CommandInteraction
+		interaction: CommandInteraction | ContextMenuInteraction
 	): Promise<void> | void;
 
 	public async enable(bot: Bot, guild: Guild): Promise<void> {
@@ -62,11 +66,13 @@ export abstract class Command extends Setable {
 		help = 'NO HELP INFO SET',
 		info = 'NO INFO SET',
 		module,
+		contextMenu = false,
 	}: {
 		name: string;
 		help: string;
 		info: string;
 		module: BotModule;
+		contextMenu?: boolean;
 	}) {
 		super();
 		this.name = name;
@@ -74,7 +80,9 @@ export abstract class Command extends Setable {
 		this.help = help;
 		this.info = info;
 		this.module = module;
-		this.data.setName(name).setDescription(help);
+		if (!contextMenu) {
+			(this.data as SlashCommandBuilder).setName(name).setDescription(help);
+		}
 		consolaGlobalInstance.info(`Initializing Command | ${this.name}`);
 	}
 

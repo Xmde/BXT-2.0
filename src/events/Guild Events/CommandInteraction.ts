@@ -1,7 +1,12 @@
 // Event that runs when the bot is ready.
 // Prints out a ready command to the console.
 
-import { CommandInteraction, Interaction } from 'discord.js';
+import {
+	CommandInteraction,
+	ContextMenuInteraction,
+	Interaction,
+} from 'discord.js';
+import { waitForDebugger } from 'inspector';
 import { Bot } from '../../client/Client';
 import { DBModGuild } from '../../database/models/ModGuild';
 import { Command } from '../../interfaces/Command';
@@ -20,10 +25,28 @@ export const once: boolean = false;
  */
 export const run: RunFunction = async (client, interaction: Interaction) => {
 	// If the Interaction is not a command than we dont care
-	if (!interaction.isCommand()) return;
+	if (!(interaction.isCommand() || interaction.isContextMenu())) return;
+
+	// Checks to see if bot is rate limited
+	let rateLimit = 1;
+	while (client.isRateLimited()) {
+		if (rateLimit > 5) {
+			client.logger.error(
+				`Bot rate limited Failed to run command (${interaction.command}) after 5 attempts`
+			);
+			throw new Error(
+				`Bot rate limited Failed to run command (${interaction.command}) after 5 attempts`
+			);
+		}
+		client.logger.warn(
+			`Attempting to run command (${interaction.commandName}) while rate limited globaly! Waiting 2 seconds (${rateLimit}/5)`
+		);
+		rateLimit++;
+		await Bot.delay(2000);
+	}
 
 	// Makes sure the interaction is a command interaction
-	interaction as CommandInteraction;
+	interaction as CommandInteraction | ContextMenuInteraction;
 
 	// The Setting Command is handeled seperatly because it is used in bxt!setup
 	if (interaction.commandName === 'setting') return;

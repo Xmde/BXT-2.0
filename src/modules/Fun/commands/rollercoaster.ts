@@ -1,4 +1,5 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { ContextMenuCommandBuilder } from '@discordjs/builders';
+import { ApplicationCommandType } from 'discord-api-types/v9';
 import {
 	CommandInteraction,
 	CacheType,
@@ -6,56 +7,39 @@ import {
 	StageChannel,
 	Collection,
 	Guild,
+	ContextMenuInteraction,
 } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
 import { BotModule } from '../../../interfaces/Module';
 
-const delay = async (ms: number) =>
-	new Promise((resolve) => setTimeout(resolve, ms));
-
 export default class PingCommand extends Command {
 	constructor(module: BotModule) {
 		super({
-			name: 'rollercoaster',
+			name: 'Rollercoaster',
 			help: 'Makes the user have a FUN time',
 			info: 'Rollercoaster Command',
 			module,
+			contextMenu: true,
 		});
-		this.data
-			.addUserOption((option) =>
-				option
-					.setName('user')
-					.setDescription('User that goes WHOOOOO')
-					.setRequired(true)
-			)
-			.addIntegerOption((option) =>
-				option
-					.setName('time')
-					.setDescription('How long shall it last')
-					.setRequired(true)
-			);
+		this.data = new ContextMenuCommandBuilder()
+			.setName('Rollercoaster')
+			.setType(ApplicationCommandType.User);
 	}
 
 	public async run(
 		client: Bot,
-		interaction: CommandInteraction<CacheType>
+		interaction: ContextMenuInteraction<CacheType>
 	): Promise<void> {
-		const guild = client.guilds.cache.get(interaction.guildId);
-		const user = guild!.members.cache.get(
-			interaction.options.getUser('user')!.id
-		);
-		//Checks to make sure that the time given is less than 15 and greater than 0
-		if (
-			interaction.options.getInteger('time')! > 15 ||
-			interaction.options.getInteger('time')! <= 0
-		) {
+		if (client.isRateLimited(`/guilds/${interaction.guildId}/members/:id`)) {
 			interaction.reply({
-				content: 'Enter a time between 0 and 15 seconds!',
+				content: 'You must wait before using that command!',
 				ephemeral: true,
 			});
 			return;
 		}
+		const guild = client.guilds.cache.get(interaction.guildId);
+		const user = guild!.members.cache.get(interaction.targetId);
 
 		//Gets a bunch of usefull info from discord.
 		const originalChannel = user!.voice.channel;
@@ -85,17 +69,18 @@ export default class PingCommand extends Command {
 		let randomChannel = originalChannel;
 
 		//Loop which gets a random voice channel and move the user to it.
-		for (let i = 0; i < interaction.options.getInteger('time')! * 2; i++) {
+		for (let i = 0; i < 9; i++) {
 			randomChannel = voiceChannels
 				.filter((c) => c.id !== randomChannel.id)
 				.random() as VoiceChannel | StageChannel;
-			user!.voice.setChannel(randomChannel);
-			await delay(500);
+			await user!.voice.setChannel(randomChannel);
+			//await delay(50);
 		}
 
 		//Sets the user back to the original channel.
-		user!.voice.setChannel(originalChannel);
-		await delay(3000);
+		await user!.voice.setChannel(originalChannel);
+		client.rateLimit(7500, `/guilds/${interaction.guildId}/members/:id`);
+		//await delay(3000);
 		try {
 			interaction.deleteReply();
 		} catch {}

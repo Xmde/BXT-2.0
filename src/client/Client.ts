@@ -27,6 +27,7 @@ const globPromise = promisify(glob);
  */
 class Bot extends Client {
 	private static instance: Bot;
+	private rateLimits: { global: boolean; route: string }[] = [];
 
 	public logger: Consola = consola;
 	public events: Collection<string, Event> = new Collection();
@@ -34,6 +35,9 @@ class Bot extends Client {
 	public globalCommands: Collection<string, GlobalCommand> = new Collection();
 	public db: Database;
 	public config: Config;
+
+	public static delay = async (ms: number) =>
+		new Promise((resolve) => setTimeout(resolve, ms));
 
 	/**
 	 * The bot class is a singleton class.
@@ -173,6 +177,35 @@ class Bot extends Client {
 		process.on('unhandledRejection', (error) => {
 			throw error;
 		});
+	}
+
+	public isRateLimited(route: string = ''): boolean {
+		const global = route === '' ? true : false;
+		if (global) {
+			return this.rateLimits.some((val) => val.global === true);
+		}
+		return (
+			this.rateLimits.some((val) => val.route === route) ||
+			this.rateLimits.some((val) => val.global === true)
+		);
+	}
+
+	public rateLimit(timeout: number, route: string = ''): void {
+		const global = route === '' ? true : false;
+		this.rateLimits.push({ global, route });
+		this.logger.trace(
+			`Rate Limit Added ${timeout}ms | ${route} | ${JSON.stringify(
+				this.rateLimits
+			)}`
+		);
+		setTimeout(() => {
+			this.rateLimits = this.rateLimits.filter(
+				(value) => !(value.global === global && value.route === route)
+			);
+			this.logger.trace(
+				`Rate Limit Removed | ${route} | ${JSON.stringify(this.rateLimits)}`
+			);
+		}, timeout);
 	}
 }
 

@@ -27,18 +27,28 @@ import { BotModule } from '../interfaces/Module';
 import { GlobalRunFunction } from '../interfaces/Command';
 import { setUpGuild } from '../events/Guild Events/GuildJoin';
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const timeout = 45000;
 
 export const name: string = 'setup';
 
 export const run: GlobalRunFunction = async (client, message, _) => {
-	// Must be the guild owner to run this command.
-	if (message.guild.ownerId !== message.author.id) {
-		message.channel.send(
+	if (!message.inGuild()) {
+		return message.channel.send(
 			Bot.messageEmbed(
-				{ description: 'You must be the Guild Owner to run this Command!' },
+				{ description: 'This command must be run in a guild' },
+				message
+			)
+		);
+	}
+
+	// Must have admin permissions to run this commnad
+	if (!message.member.permissions.has('ADMINISTRATOR')) {
+		return message.channel.send(
+			Bot.messageEmbed(
+				{
+					description:
+						'You must have the `ADMINISTRATOR` permission to run this command',
+				},
 				message
 			)
 		);
@@ -62,7 +72,7 @@ export const run: GlobalRunFunction = async (client, message, _) => {
 				)
 			)
 			.then(async (msg: Message) => {
-				await delay(5000);
+				await Bot.delay(5000);
 				msg.delete();
 			});
 		message.delete();
@@ -206,7 +216,7 @@ class SetupMenu {
 					this.message
 				)
 			);
-			await delay(10000);
+			await Bot.delay(10000);
 			this.message.delete();
 			this.userMessage.delete();
 		});
@@ -503,7 +513,7 @@ class SetupMenu {
 					perms;
 				await ModGuild.save();
 				this.command.updatePermissions(this.client, this.message.guild);
-				await delay(5000);
+				await Bot.delay(5000);
 				this.moduleActionRowCollector.resetTimer();
 				this.moduleSettingsButtonsCollector.resetTimer();
 				this.commandActionRowCollector.resetTimer();
@@ -619,7 +629,7 @@ class SetupMenu {
 				i.reply({
 					content: 'Setting updated Successfully',
 				});
-				await delay(1000);
+				await Bot.delay(1000);
 				i.deleteReply();
 				this.optionCommand.delete();
 				this.optionCommand = null;
@@ -681,7 +691,7 @@ class SetupMenu {
 				i.reply({
 					content: 'Setting updated Successfully',
 				});
-				await delay(1000);
+				await Bot.delay(1000);
 				i.deleteReply();
 				this.optionCommand.delete();
 				this.optionCommand = null;
