@@ -35,7 +35,7 @@ export const run: RunFunction = async (client, guild: Guild) => {
  */
 export async function removeGuild(client: Bot, guild: Guild): Promise<void> {
 	const modGuildSchema: Model<DBModGuild> = client.db.load('modguild');
-	await modGuildSchema.remove({ guildId: guild.id });
+	await modGuildSchema.deleteOne({ guildId: guild.id });
 
 	guild.commands.fetch().then((commands) => {
 		commands.forEach((command) => {
