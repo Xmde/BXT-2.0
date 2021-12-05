@@ -92,7 +92,9 @@ abstract class BotModule extends Setable {
 	}
 
 	public async resetModule(client: Bot, guild: Guild): Promise<void> {
-		return client.logger.trace(`Resetting module ${this.name}`);
+		return client.logger.trace(
+			`Resetting module ${this.displyName} for ${guild.name}`
+		);
 	}
 }
 

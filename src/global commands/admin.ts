@@ -35,16 +35,16 @@ export const run: GlobalRunFunction = async (client, message, args) => {
 		case 'reset':
 			const guild = client.guilds.cache.get(args[0]);
 			if (!guild) return message.channel.send('No guild found');
-			removeGuild(client, guild);
+			removeGuild(client, guild, false);
 			return message.channel.send(`Resetting guild ${guild.name}(${guild.id})`);
 
 		// Resets on all guilds. Removes all commands and data for all guilds.
 		case 'resetall':
-			client.application.commands.cache.forEach((command) => {
+			(await client.application.commands.fetch()).forEach((command) => {
 				command.delete();
 			});
 			client.guilds.cache.forEach((guild) => {
-				removeGuild(client, guild);
+				removeGuild(client, guild, false);
 			});
 			return message.channel.send('Resetting all guilds');
 	}

@@ -25,7 +25,7 @@ export const once: boolean = false;
 export const run: RunFunction = async (client, guild: Guild) => {
 	const ownerTag = (await guild.fetchOwner()).user?.tag;
 	client.logger.info(`Left Guild | Name(${guild.name}) | Owner(${ownerTag})`);
-	removeGuild(client, guild);
+	removeGuild(client, guild, true);
 };
 
 /**
@@ -33,17 +33,23 @@ export const run: RunFunction = async (client, guild: Guild) => {
  * @param client Bot client
  * @param guildId The id of the guild that is being set up
  */
-export async function removeGuild(client: Bot, guild: Guild): Promise<void> {
+export async function removeGuild(
+	client: Bot,
+	guild: Guild,
+	leaving: boolean
+): Promise<void> {
 	const modGuildSchema: Model<DBModGuild> = client.db.load('modguild');
 	await modGuildSchema.deleteOne({ guildId: guild.id });
 
-	guild.commands.fetch().then((commands) => {
-		commands.forEach((command) => {
-			command.applicationId === client.application.id
-				? command.delete()
-				: undefined;
+	if (!leaving) {
+		guild.commands.fetch().then((commands) => {
+			commands.forEach((command) => {
+				command.applicationId === client.application.id
+					? command.delete()
+					: undefined;
+			});
 		});
-	});
+	}
 	client.modules.forEach((module) => {
 		module.resetModule(client, guild);
 	});
