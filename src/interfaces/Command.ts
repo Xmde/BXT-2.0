@@ -50,7 +50,7 @@ export abstract class Command extends Setable {
 	public abstract run(
 		client: Bot,
 		interaction: CommandInteraction | ContextMenuInteraction
-	): Promise<void> | void;
+	): Promise<any> | any;
 
 	public async enable(bot: Bot, guild: Guild): Promise<void> {
 		await this.setStatus(bot, guild.id, true);

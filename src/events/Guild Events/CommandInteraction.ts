@@ -56,7 +56,7 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 	const module: BotModule = command?.module;
 	const ModGuildSchema = client.db.load('modguild');
 	const ModGuild: DBModGuild = await ModGuildSchema.findOne({
-		guildID: interaction.guild.id,
+		guildId: interaction.guild.id,
 	});
 
 	client.logger.log(

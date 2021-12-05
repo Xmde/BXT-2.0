@@ -9,8 +9,6 @@ module.exports = {
 			restart_delay: 5000,
 			log_date_format: 'YYYY-MM-DDTHH:mm:ss',
 			post_update: ['yarn build'],
-			repo: 'git@github.com:Xmde/BXT-2.0.git',
-			ref: 'origin/main',
 		},
 	],
 };
