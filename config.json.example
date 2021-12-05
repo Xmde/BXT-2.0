@@ -1,8 +1,13 @@
 {
-  "token": "",
-  "mongoURI": "",
-  "twitch": {
+	"token": "",
+	"mongoURI": "",
+	"twitch": {
 		"clientID": "",
 		"clientSecret": ""
+	},
+	"youtube": {
+		"callbackurl": "",
+		"callbackport": ,
+		"apiKey": ""
 	}
 }
