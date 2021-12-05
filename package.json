@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "ts-node-dev --respawn --transpile-only --poll ./src/index.ts",
 		"lint": "prettier --write .",
-		"build": "tsc"
+		"build": "tsc",
+		"start": "node ./dist/src/index.js"
 	},
 	"repository": {
 		"type": "git",
