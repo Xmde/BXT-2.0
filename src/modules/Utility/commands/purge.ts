@@ -1,3 +1,7 @@
+import {
+	SlashCommandBooleanOption,
+	SlashCommandBuilder,
+} from '@discordjs/builders';
 import { CommandInteraction, CacheType, Guild, TextChannel } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
@@ -11,7 +15,7 @@ export default class PingCommand extends Command {
 			info: 'Purge Command',
 			module,
 		});
-		this.data.addIntegerOption((amount) => {
+		(this.data as SlashCommandBuilder).addIntegerOption((amount) => {
 			return amount
 				.setName('amount')
 				.setDescription('The amount of messages to delete')
