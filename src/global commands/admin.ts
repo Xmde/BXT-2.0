@@ -40,6 +40,9 @@ export const run: GlobalRunFunction = async (client, message, args) => {
 
 		// Resets on all guilds. Removes all commands and data for all guilds.
 		case 'resetall':
+			client.application.commands.cache.forEach((command) => {
+				command.delete();
+			});
 			client.guilds.cache.forEach((guild) => {
 				removeGuild(client, guild);
 			});
