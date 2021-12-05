@@ -19,11 +19,10 @@ export const once: boolean = false;
  * @returns None
  */
 export const run: RunFunction = async (client, message: Message) => {
-	if (
-		message.author.bot ||
-		!message.guild ||
-		!message.content.toLowerCase().startsWith('bxt!')
-	)
+	if (message.partial) {
+		return client.logger.warn(`Partial message received: ${message.id}`);
+	}
+	if (message.author.bot || !message.content.toLowerCase().startsWith('bxt!'))
 		return;
 	const args: string[] = message.content
 		.slice('bxt!'.length)

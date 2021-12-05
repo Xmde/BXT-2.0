@@ -74,13 +74,11 @@ export default class PingCommand extends Command {
 				.filter((c) => c.id !== randomChannel.id)
 				.random() as VoiceChannel | StageChannel;
 			await user!.voice.setChannel(randomChannel);
-			//await delay(50);
 		}
 
 		//Sets the user back to the original channel.
 		await user!.voice.setChannel(originalChannel);
 		client.rateLimit(7500, `/guilds/${interaction.guildId}/members/:id`);
-		//await delay(3000);
 		try {
 			interaction.deleteReply();
 		} catch {}

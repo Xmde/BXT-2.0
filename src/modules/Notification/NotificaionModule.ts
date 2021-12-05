@@ -6,7 +6,7 @@ import { BotModule } from '../../interfaces/Module';
 import TwitchApi from 'node-twitch';
 import { APIStreamResponse } from 'node-twitch/dist/types/responses';
 import { DBModGuild } from '../../database/models/ModGuild';
-import { NewsChannel, TextChannel } from 'discord.js';
+import { Guild, NewsChannel, TextChannel } from 'discord.js';
 import pubSubHubbub from 'pubsubhubbub';
 import xml2js from 'xml2js';
 import { google } from 'googleapis';
@@ -222,5 +222,13 @@ https://twitch.tv/${stream.user_name.toLowerCase()}`);
 			return true;
 		}
 		return false;
+	}
+
+	public async resetModule(client: Bot, guild: Guild): Promise<void> {
+		client.logger.trace(`Resetting Notification Module for ${guild.name}`);
+		const notifs = await this.NotifSchema.find({ guilds: guild.id });
+		for (const notif of notifs) {
+			notif.removeGuild(guild.id);
+		}
 	}
 }

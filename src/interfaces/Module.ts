@@ -90,6 +90,10 @@ abstract class BotModule extends Setable {
 		if (!module) return false;
 		return module.enabled;
 	}
+
+	public async resetModule(client: Bot, guild: Guild): Promise<void> {
+		return client.logger.trace(`Resetting module ${this.name}`);
+	}
 }
 
 export { BotModule };

@@ -60,7 +60,9 @@ class Bot extends Client {
 				Intents.FLAGS.GUILDS,
 				Intents.FLAGS.GUILD_VOICE_STATES,
 				Intents.FLAGS.GUILD_MESSAGES,
+				Intents.FLAGS.DIRECT_MESSAGES,
 			],
+			partials: ['CHANNEL'],
 		});
 		this.config = config;
 		this.db = new Database(this.config.mongoURI);
