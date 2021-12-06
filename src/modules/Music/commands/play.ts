@@ -78,7 +78,8 @@ export default class PlayCommand extends Command {
 					channelId: channel.id,
 					guildId: channel.guild.id,
 					adapterCreator: channel.guild.voiceAdapterCreator,
-				})
+				}),
+				interaction.guild.id
 			);
 			subscription.voiceConnection.on('error', client.logger.warn);
 			this.module.subscriptions.set(interaction.guild.id, subscription);
@@ -100,10 +101,18 @@ export default class PlayCommand extends Command {
 		try {
 			const input = interaction.options.getString('input').split(' ');
 			const song = await Song.from(input);
-			subscription.enqueue(song);
-			interaction.editReply(
-				`Added **${song.title}** to the queue!\n${song.url}`
-			);
+			if (song instanceof Song) {
+				subscription.enqueue(song);
+				interaction.editReply(
+					`Added **${song.title}** to the queue!\n${song.url}`
+				);
+			} else {
+				const data = song.shift();
+				subscription.enqueue(song as Song[]);
+				interaction.editReply(
+					`Added **${data.title}** playlist to the queue!\n${data.url}`
+				);
+			}
 		} catch (err) {
 			client.logger.warn(`Failed to play song | ${err}`);
 			return interaction.editReply(

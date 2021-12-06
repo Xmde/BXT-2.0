@@ -8,9 +8,10 @@ import {
 	VoiceConnectionDisconnectReason,
 	VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { TeamMemberMembershipState } from 'discord-api-types';
+import { Snowflake, TeamMemberMembershipState } from 'discord-api-types';
 import { threadId } from 'worker_threads';
 import { Bot } from '../../../client/Client';
+import MusicModule from '../MusicModule';
 import { Song } from './Song';
 
 export class Subscription {
@@ -20,8 +21,10 @@ export class Subscription {
 
 	private readyLock: boolean = false;
 	private queueLock: boolean = false;
+	private guildId: Snowflake;
 
-	constructor(voiceConnection: VoiceConnection) {
+	constructor(voiceConnection: VoiceConnection, guildId: Snowflake) {
+		this.guildId = guildId;
 		this.voiceConnection = voiceConnection;
 		this.audioPlayer = createAudioPlayer();
 		this.queue = [];
@@ -130,9 +133,13 @@ export class Subscription {
 		voiceConnection.subscribe(this.audioPlayer);
 	}
 
-	public enqueue(song: Song) {
-		this.queue.push(song);
-		this.processQueue();
+	public enqueue(song: Song | Song[]) {
+		if (Array.isArray(song)) {
+			song.forEach((s) => this.enqueue(s));
+		} else {
+			this.queue.push(song);
+			this.processQueue();
+		}
 	}
 
 	public stop() {
@@ -142,13 +149,17 @@ export class Subscription {
 	}
 
 	private async processQueue() {
+		if (this.queue.length === 0) {
+			this.voiceConnection.destroy();
+			return (
+				Bot.getInstance().modules.get('music') as MusicModule
+			).subscriptions.delete(this.guildId);
+		}
 		if (
 			this.queueLock ||
-			this.audioPlayer.state.status !== AudioPlayerStatus.Idle ||
-			this.queue.length === 0
+			this.audioPlayer.state.status !== AudioPlayerStatus.Idle
 		)
 			return;
-
 		this.queueLock = true;
 
 		const track = this.queue.shift();

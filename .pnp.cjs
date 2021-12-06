@@ -49,6 +49,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["consola", "npm:2.15.3"],
             ["discord-api-types", "npm:0.24.0"],
             ["discord.js", "npm:13.3.1"],
+            ["ffmpeg-static", "npm:4.4.0"],
             ["glob", "npm:7.2.0"],
             ["googleapis", "npm:91.0.0"],
             ["husky", "npm:7.0.4"],
@@ -63,7 +64,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"],
             ["xml2js", "npm:0.4.23"],
             ["yt-search", "npm:2.10.2"],
-            ["ytdl-core", "npm:4.9.1"]
+            ["ytdl-core", "npm:4.9.1"],
+            ["ytpl", "npm:2.2.3"]
           ],
           "linkType": "SOFT",
         }]
@@ -314,6 +316,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@cspotcode/source-map-support", "npm:0.7.0"],
             ["@cspotcode/source-map-consumer", "npm:0.8.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@derhuerst/http-basic", [
+        ["npm:8.2.1", {
+          "packageLocation": "./.yarn/cache/@derhuerst-http-basic-npm-8.2.1-6e64f77dc6-35add0f13f.zip/node_modules/@derhuerst/http-basic/",
+          "packageDependencies": [
+            ["@derhuerst/http-basic", "npm:8.2.1"],
+            ["caseless", "npm:0.12.0"],
+            ["concat-stream", "npm:1.6.2"],
+            ["http-response-object", "npm:3.0.2"],
+            ["parse-cache-control", "npm:1.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -589,6 +604,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@types/node", [
+        ["npm:10.17.60", {
+          "packageLocation": "./.yarn/cache/@types-node-npm-10.17.60-63ac1f669f-2cdb3a77d0.zip/node_modules/@types/node/",
+          "packageDependencies": [
+            ["@types/node", "npm:10.17.60"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:16.11.7", {
           "packageLocation": "./.yarn/cache/@types-node-npm-16.11.7-1799a0a435-2706403e6e.zip/node_modules/@types/node/",
           "packageDependencies": [
@@ -1237,6 +1259,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["consola", "npm:2.15.3"],
             ["discord-api-types", "npm:0.24.0"],
             ["discord.js", "npm:13.3.1"],
+            ["ffmpeg-static", "npm:4.4.0"],
             ["glob", "npm:7.2.0"],
             ["googleapis", "npm:91.0.0"],
             ["husky", "npm:7.0.4"],
@@ -1251,7 +1274,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"],
             ["xml2js", "npm:0.4.23"],
             ["yt-search", "npm:2.10.2"],
-            ["ytdl-core", "npm:4.9.1"]
+            ["ytdl-core", "npm:4.9.1"],
+            ["ytpl", "npm:2.2.3"]
           ],
           "linkType": "SOFT",
         }]
@@ -1579,6 +1603,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/concat-map-npm-0.0.1-85a921b7ee-902a9f5d89.zip/node_modules/concat-map/",
           "packageDependencies": [
             ["concat-map", "npm:0.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["concat-stream", [
+        ["npm:1.6.2", {
+          "packageLocation": "./.yarn/cache/concat-stream-npm-1.6.2-2bee337060-1ef77032cb.zip/node_modules/concat-stream/",
+          "packageDependencies": [
+            ["concat-stream", "npm:1.6.2"],
+            ["buffer-from", "npm:1.1.2"],
+            ["inherits", "npm:2.0.4"],
+            ["readable-stream", "npm:2.3.7"],
+            ["typedarray", "npm:0.0.6"]
           ],
           "linkType": "HARD",
         }]
@@ -2209,6 +2246,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["ffmpeg-static", [
+        ["npm:4.4.0", {
+          "packageLocation": "./.yarn/unplugged/ffmpeg-static-npm-4.4.0-f2190230cf/node_modules/ffmpeg-static/",
+          "packageDependencies": [
+            ["ffmpeg-static", "npm:4.4.0"],
+            ["@derhuerst/http-basic", "npm:8.2.1"],
+            ["env-paths", "npm:2.2.1"],
+            ["https-proxy-agent", "npm:5.0.0"],
+            ["progress", "npm:2.0.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["fill-range", [
         ["npm:7.0.1", {
           "packageLocation": "./.yarn/cache/fill-range-npm-7.0.1-b8b1817caa-cc283f4e65.zip/node_modules/fill-range/",
@@ -2681,6 +2731,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@tootallnate/once", "npm:1.1.2"],
             ["agent-base", "npm:6.0.2"],
             ["debug", "virtual:428f325a939c2653ad822eb3d75efb02ac311523dd0d4f9645afc39ea00bd86eceac35a9d59c9b6977d76b670a4ef0ae057ea572338a44729aa592711a8c05a3#npm:4.3.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["http-response-object", [
+        ["npm:3.0.2", {
+          "packageLocation": "./.yarn/cache/http-response-object-npm-3.0.2-cbb68c5487-6cbdcb4ce7.zip/node_modules/http-response-object/",
+          "packageDependencies": [
+            ["http-response-object", "npm:3.0.2"],
+            ["@types/node", "npm:10.17.60"]
           ],
           "linkType": "HARD",
         }]
@@ -4040,6 +4100,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["parse-cache-control", [
+        ["npm:1.0.1", {
+          "packageLocation": "./.yarn/cache/parse-cache-control-npm-1.0.1-81068d3680-5a70868792.zip/node_modules/parse-cache-control/",
+          "packageDependencies": [
+            ["parse-cache-control", "npm:1.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["parse-json", [
         ["npm:5.2.0", {
           "packageLocation": "./.yarn/cache/parse-json-npm-5.2.0-00a63b1199-62085b17d6.zip/node_modules/parse-json/",
@@ -4193,6 +4262,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/process-nextick-args-npm-2.0.1-b8d7971609-1d38588e52.zip/node_modules/process-nextick-args/",
           "packageDependencies": [
             ["process-nextick-args", "npm:2.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["progress", [
+        ["npm:2.0.3", {
+          "packageLocation": "./.yarn/cache/progress-npm-2.0.3-d1f87e2ac6-f67403fe7b.zip/node_modules/progress/",
+          "packageDependencies": [
+            ["progress", "npm:2.0.3"]
           ],
           "linkType": "HARD",
         }]
@@ -5342,6 +5420,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["typedarray", [
+        ["npm:0.0.6", {
+          "packageLocation": "./.yarn/cache/typedarray-npm-0.0.6-37638b2241-33b39f3d0e.zip/node_modules/typedarray/",
+          "packageDependencies": [
+            ["typedarray", "npm:0.0.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["typescript", [
         ["patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8", {
           "packageLocation": "./.yarn/cache/typescript-patch-d95d140154-bd629ad0da.zip/node_modules/typescript/",
@@ -5693,6 +5780,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["m3u8stream", "npm:0.8.4"],
             ["miniget", "npm:4.2.1"],
             ["sax", "npm:1.2.4"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["ytpl", [
+        ["npm:2.2.3", {
+          "packageLocation": "./.yarn/cache/ytpl-npm-2.2.3-b5a3ab1813-438396f1f8.zip/node_modules/ytpl/",
+          "packageDependencies": [
+            ["ytpl", "npm:2.2.3"],
+            ["miniget", "npm:4.2.1"]
           ],
           "linkType": "HARD",
         }]
