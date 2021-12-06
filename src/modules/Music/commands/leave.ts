@@ -5,16 +5,8 @@
 import { CommandInteraction, CacheType, Guild, GuildMember } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import {
-	entersState,
-	joinVoiceChannel,
-	VoiceConnectionStatus,
-} from '@discordjs/voice';
-import { Subscription } from '../Classes/Subscription';
 import MusicModule from '../MusicModule';
 import { BotModule } from '../../../interfaces/Module';
-import { Song } from '../Classes/Song';
 
 export default class LeaveCommand extends Command {
 	constructor(module: BotModule) {

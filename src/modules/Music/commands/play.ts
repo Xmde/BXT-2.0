@@ -9,13 +9,10 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import {
 	entersState,
 	joinVoiceChannel,
-	VoiceConnection,
 	VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { Subscription } from '../Classes/Subscription';
-import MusicModule from '../MusicModule';
+import MusicModule, { Subscription, Song } from '../MusicModule';
 import { BotModule } from '../../../interfaces/Module';
-import { Song } from '../Classes/Song';
 
 export default class PlayCommand extends Command {
 	constructor(module: BotModule) {
