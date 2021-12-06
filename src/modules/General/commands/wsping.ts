@@ -37,7 +37,7 @@ export default class PingCommand extends Command {
 					{
 						description: `WebSocket: ${client.ws.ping}ms\nMessage Create: ${
 							timeCreate - time
-						}ms\nMessage Delete: ${timeRTT - timeCreate}\nMessage RTT: ${
+						}ms\nMessage Delete: ${timeRTT - timeCreate}ms\nMessage RTT: ${
 							timeRTT - time
 						}ms\nMessage Edit: ${timedis2 - timedis1}ms`,
 					},
