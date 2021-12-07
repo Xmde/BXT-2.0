@@ -4,3 +4,4 @@ import { Bot } from './client/Client';
 
 // Start the bot with the config.
 Bot.getInstance(File as Config);
+console.log('Started');

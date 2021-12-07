@@ -59,6 +59,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["node-twitch", "npm:0.4.5"],
             ["prettier", "npm:2.4.1"],
             ["pubsubhubbub", "npm:1.0.1"],
+            ["r6api.js", "npm:4.0.0"],
             ["ts-node", "virtual:e37c006fe657e1db7b93741ab65e3d8f20ee4ccbd54e30e36813d05d28379b1873fb2fe9b40fc2afee5b2b00554c6f1240ae96238efd7db51a8a33b52f08b55e#npm:10.4.0"],
             ["ts-node-dev", "virtual:e37c006fe657e1db7b93741ab65e3d8f20ee4ccbd54e30e36813d05d28379b1873fb2fe9b40fc2afee5b2b00554c6f1240ae96238efd7db51a8a33b52f08b55e#npm:1.1.8"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"],
@@ -1269,6 +1270,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["node-twitch", "npm:0.4.5"],
             ["prettier", "npm:2.4.1"],
             ["pubsubhubbub", "npm:1.0.1"],
+            ["r6api.js", "npm:4.0.0"],
             ["ts-node", "virtual:e37c006fe657e1db7b93741ab65e3d8f20ee4ccbd54e30e36813d05d28379b1873fb2fe9b40fc2afee5b2b00554c6f1240ae96238efd7db51a8a33b52f08b55e#npm:10.4.0"],
             ["ts-node-dev", "virtual:e37c006fe657e1db7b93741ab65e3d8f20ee4ccbd54e30e36813d05d28379b1873fb2fe9b40fc2afee5b2b00554c6f1240ae96238efd7db51a8a33b52f08b55e#npm:1.1.8"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"],
@@ -4374,6 +4376,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/quick-lru-npm-4.0.1-ef8aa17c9c-bea46e1abf.zip/node_modules/quick-lru/",
           "packageDependencies": [
             ["quick-lru", "npm:4.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["r6api.js", [
+        ["npm:4.0.0", {
+          "packageLocation": "./.yarn/cache/r6api.js-npm-4.0.0-47893c4baa-5c9e1091f5.zip/node_modules/r6api.js/",
+          "packageDependencies": [
+            ["r6api.js", "npm:4.0.0"],
+            ["node-fetch", "npm:2.6.6"]
           ],
           "linkType": "HARD",
         }]

@@ -90,6 +90,7 @@
 		"mongoose": "^6.0.12",
 		"node-twitch": "^0.4.5",
 		"pubsubhubbub": "^1.0.1",
+		"r6api.js": "^4.0.0",
 		"xml2js": "^0.4.23",
 		"yt-search": "^2.10.2",
 		"ytdl-core": "^4.9.1",
