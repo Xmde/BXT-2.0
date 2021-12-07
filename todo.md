@@ -10,17 +10,17 @@ _Italics_ - Low Priority
 
 - [x] **Implement command handleing**
 
-- [ ] **Implement more utility commands**
+- [x] **Implement more utility commands**
 
 - [x] **Implement a smart help command**
 
-- [ ] _Comeup with more modules and commands for thoes modules_
+- [x] _Comeup with more modules and commands for thoes modules_
 
 - [x] Implement Socials into the bot
 
 - [ ] Add utility commands for Notifications (See what channels etc)
 
-- [ ] _Implement a music bot into the framework._
+- [x] _Implement a music bot into the framework._
 
 ## Setup Menu
 
@@ -32,9 +32,9 @@ _Italics_ - Low Priority
 
 ## Other
 
-- [ ] Test Rollercoaster command
+- [x] Test Rollercoaster command
 
-- [ ] Runs tests with friends
+- [x] Runs tests with friends
 
 - [ ] Implement some sort of guild blacklist / whitelist system
 
