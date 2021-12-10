@@ -52,7 +52,10 @@ export const run: RunFunction = async (client, interaction: Interaction) => {
 	if (interaction.commandName === 'setting') return;
 
 	// Pulls info from the Database
-	const command: Command = Command.getCommand(client, interaction.commandName);
+	const command: Command = Command.getCommand(
+		client,
+		interaction.commandName.toLowerCase()
+	);
 	const module: BotModule = command?.module;
 	const ModGuildSchema = client.db.load('modguild');
 	const ModGuild: DBModGuild = await ModGuildSchema.findOne({
