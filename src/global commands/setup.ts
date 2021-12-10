@@ -13,6 +13,7 @@ import {
 	MessageButton,
 	MessageButtonStyleResolvable,
 	MessageSelectMenu,
+	Role,
 	SelectMenuInteraction,
 } from 'discord.js';
 import { Collection } from 'mongoose';
@@ -821,7 +822,14 @@ class SetupMenu {
 			this.module.name,
 			this.command.name
 		);
-		const roles = this.message.guild?.roles.cache;
+		let roles: DiscordCollection<string, Role> = new DiscordCollection();
+
+		this.message.guild?.roles.cache.forEach((role) => {
+			if (roles.size > 25) {
+				roles.set(role.id, role);
+			}
+		});
+
 		const PermissionSelectMenu = new MessageSelectMenu()
 			.setCustomId('permission-select-menu')
 			.setPlaceholder('Select Roles')
