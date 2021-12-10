@@ -822,10 +822,11 @@ class SetupMenu {
 			this.module.name,
 			this.command.name
 		);
+
 		let roles: DiscordCollection<string, Role> = new DiscordCollection();
 
 		this.message.guild?.roles.cache.forEach((role) => {
-			if (roles.size > 25) {
+			if (roles.size < 25) {
 				roles.set(role.id, role);
 			}
 		});
