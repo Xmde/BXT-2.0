@@ -1,4 +1,7 @@
-import { ContextMenuCommandBuilder } from '@discordjs/builders';
+import {
+	ContextMenuCommandBuilder,
+	SlashCommandBuilder,
+} from '@discordjs/builders';
 import { ApplicationCommandType } from 'discord-api-types/v9';
 import {
 	CommandInteraction,
@@ -8,6 +11,8 @@ import {
 	Collection,
 	Guild,
 	ContextMenuInteraction,
+	User,
+	GuildMember,
 } from 'discord.js';
 import { Bot } from '../../../client/Client';
 import { Command } from '../../../interfaces/Command';
@@ -16,20 +21,30 @@ import { BotModule } from '../../../interfaces/Module';
 export default class PingCommand extends Command {
 	constructor(module: BotModule) {
 		super({
-			name: 'Rollercoaster',
+			name: 'rollercoaster',
 			help: 'Makes the user have a FUN time',
 			info: 'Rollercoaster Command',
 			module,
 			contextMenu: true,
 		});
-		this.data = new ContextMenuCommandBuilder()
-			.setName('Rollercoaster')
-			.setType(ApplicationCommandType.User);
+		if (this.contextMenu) {
+			console.log(this.contextMenu);
+			this.data = new ContextMenuCommandBuilder()
+				.setName('Rollercoaster')
+				.setType(ApplicationCommandType.User);
+		} else {
+			(this.data as SlashCommandBuilder).addUserOption((user) =>
+				user
+					.setName('user')
+					.setDescription('The user to rollercoaster')
+					.setRequired(true)
+			);
+		}
 	}
 
 	public async run(
 		client: Bot,
-		interaction: ContextMenuInteraction<CacheType>
+		interaction: ContextMenuInteraction<CacheType> | CommandInteraction
 	): Promise<void> {
 		if (client.isRateLimited(`/guilds/${interaction.guildId}/members/:id`)) {
 			interaction.reply({
@@ -38,9 +53,24 @@ export default class PingCommand extends Command {
 			});
 			return;
 		}
-		const guild = client.guilds.cache.get(interaction.guildId);
-		const user = guild!.members.cache.get(interaction.targetId);
 
+		const guild = client.guilds.cache.get(interaction.guildId);
+		let user: GuildMember;
+
+		if (interaction.isCommand()) {
+			user = guild!.members.cache.get(
+				interaction.options.getUser('user', true).id
+			);
+		} else {
+			user = guild!.members.cache.get(interaction.targetId);
+		}
+		if (!user) {
+			interaction.reply({
+				content: 'User not found',
+				ephemeral: true,
+			});
+			return;
+		}
 		//Gets a bunch of usefull info from discord.
 		const originalChannel = user!.voice.channel;
 		const voiceChannels = (await guild!.channels.fetch()).filter(

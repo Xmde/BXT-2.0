@@ -43,6 +43,7 @@ export abstract class Command extends Setable {
 	public help: string;
 	public info: string;
 	public module: BotModule;
+	protected contextMenu: boolean;
 
 	public data: SlashCommandBuilder | ContextMenuCommandBuilder =
 		new SlashCommandBuilder().setDefaultPermission(false);
@@ -80,6 +81,7 @@ export abstract class Command extends Setable {
 		this.help = help;
 		this.info = info;
 		this.module = module;
+		this.contextMenu = contextMenu;
 		if (!contextMenu) {
 			(this.data as SlashCommandBuilder).setName(name).setDescription(help);
 		}
@@ -135,10 +137,7 @@ export abstract class Command extends Setable {
 	}
 
 	protected async registerCommand(client: Bot, guild: Guild): Promise<void> {
-		const command = client.modules
-			.find((m) => m.name === this.module.name)
-			.commands.find((c) => c.name === this.name);
-		const commandId = (await guild.commands.create(command.data.toJSON())).id;
+		const commandId = (await guild.commands.create(this.data.toJSON())).id;
 		const ModGuildSchema = client.db.load('modguild');
 		const ModGuild: DBModGuild = await ModGuildSchema.findOne({
 			guildId: guild.id,
@@ -157,6 +156,7 @@ export abstract class Command extends Setable {
 			this.module.name,
 			this.name
 		).commandId;
+		if (!commandId) return;
 		client.logger.trace(`Unregistering Command | ${commandId}`);
 		await guild.commands.delete(commandId);
 		ModGuild.getCommand(this.module.name, this.name).commandId = '';
