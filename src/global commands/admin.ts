@@ -1,8 +1,11 @@
 import { Bot } from '../client/Client';
 import { GlobalRunFunction } from '../interfaces/Command';
 import { removeGuild } from '../events/Guild Events/GuildLeave';
+import { deflateSync } from 'zlib';
 
 export const name: string = 'admin';
+
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const run: GlobalRunFunction = async (client, message, args) => {
 	if (message.channel.type !== 'DM') return;
@@ -28,8 +31,41 @@ export const run: GlobalRunFunction = async (client, message, args) => {
 
 	switch (action) {
 		// Reloads the bot **TODO**
-		case 'reload':
-			return message.channel.send('Reloading... *TODO*');
+		case 'update':
+			message.channel.send('Updating Bot... Restarting in 10 Minutes');
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 10 Minutes',
+			});
+			await delay(1000 * 60 * 5);
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 5 Minutes',
+			});
+			await delay(1000 * 60);
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 4 Minutes',
+			});
+			await delay(1000 * 60);
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 3 Minutes',
+			});
+			await delay(1000 * 60);
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 2 Minutes',
+			});
+			await delay(1000 * 60);
+			client.user.setActivity({
+				type: 'PLAYING',
+				name: 'Updating in 1 Minute',
+			});
+			await delay(1000 * 60);
+			client.user.setActivity({ type: 'PLAYING', name: 'Updating...' });
+			await delay(1000 * 10);
+			process.exit(0);
 
 		// Resets on guild. Removes all commands and data for a guild.
 		case 'reset':

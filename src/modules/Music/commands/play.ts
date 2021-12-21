@@ -113,7 +113,7 @@ export default class PlayCommand extends Command {
 		} catch (err) {
 			client.logger.warn(`Failed to play song | ${err}`);
 			return interaction.editReply(
-				'There was an error finding that song try again later'
+				'There was an error finding that song or it is age restricted. Try again later'
 			);
 		}
 	}
